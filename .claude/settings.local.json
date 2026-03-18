@@ -5,7 +5,11 @@
       "Bash(npm create:*)",
       "Bash(npm install:*)",
       "Bash(git add:*)",
-      "Bash(git commit -m \"Initial commit: INSOLIT app - React + Express + Supabase:*)"
+      "Bash(git commit -m \"Initial commit: INSOLIT app - React + Express + Supabase:*)",
+      "Bash(gh repo:*)",
+      "Bash(brew list:*)",
+      "Bash(brew install:*)",
+      "Bash(gh auth:*)"
     ]
   }
 }
