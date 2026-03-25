@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { MapContainer, Marker, TileLayer } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -7,14 +6,14 @@ import 'leaflet/dist/leaflet.css'
 const PARIS_CENTER = [48.8566, 2.3522]
 
 const FILTERS = [
-  { key: 'restaurants', label: '🍔 Restaurants' },
-  { key: 'cadeaux', label: '🎁 Cadeaux' },
-  { key: 'activites', label: '🎱 Activités' },
+  { key: 'restaurants', label: 'Restaurants' },
+  { key: 'cadeaux', label: 'Cadeaux' },
+  { key: 'activites', label: 'Activités' },
 ]
 
 const EMOJI_BY_TYPE = {
   restaurants: '🍔',
-  cadeaux: '💈',
+  cadeaux: '🎁',
   activites: '🎱',
   nightlife: '🍸',
 }
@@ -50,12 +49,11 @@ function buildDenseMarkers() {
     }
   }
 
-  // Outer suburban markers for Nanterre / Saint-Denis / Creteil / etc.
   markers.push(
     { id: 'nanterre', lat: 48.8924, lng: 2.2066, type: 'activites', emoji: '🎱', name: 'Nanterre Fun' },
     { id: 'stdenis', lat: 48.9362, lng: 2.3574, type: 'restaurants', emoji: '🍔', name: 'Saint-Denis Food' },
     { id: 'creteil', lat: 48.7904, lng: 2.4556, type: 'nightlife', emoji: '🍸', name: 'Creteil Night' },
-    { id: 'boulogne', lat: 48.8397, lng: 2.2399, type: 'cadeaux', emoji: '💈', name: 'Boulogne Style' },
+    { id: 'boulogne', lat: 48.8397, lng: 2.2399, type: 'cadeaux', emoji: '🎁', name: 'Boulogne Style' },
     { id: 'montreuil', lat: 48.8638, lng: 2.4485, type: 'restaurants', emoji: '🍔', name: 'Montreuil Burger' }
   )
 
@@ -97,21 +95,14 @@ export default function MapView() {
   }, [allMarkers, activeFilter, query])
 
   return (
-    <div className="h-screen w-full bg-[#0d0e14] text-white flex flex-col overflow-hidden">
-      <header className="px-4 pt-4 pb-3 shrink-0">
-        <div className="flex items-center justify-between mb-3">
-          <h1 className="text-3xl font-black tracking-tight text-[#ff2e9c]">insolit</h1>
-          <button className="text-2xl text-[#ff2e9c]" aria-label="Favoris">
-            ❤
-          </button>
-        </div>
-
+    <div className="h-[calc(100vh-4rem)] w-full bg-dark-bg text-white flex flex-col overflow-hidden">
+      <div className="px-4 pt-4 pb-3 shrink-0">
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Ex : Burger, soirée..."
-          className="w-full rounded-2xl bg-[#191b26] border border-[#2a2d3d] px-4 py-3 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-[#ff2e9c]"
+          className="w-full rounded-lg bg-dark-surface border border-dark-border px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-neon-purple transition-colors"
         />
 
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
@@ -121,10 +112,10 @@ export default function MapView() {
               <button
                 key={filter.key}
                 onClick={() => setActiveFilter(filter.key)}
-                className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold border transition-colors cursor-pointer ${
+                className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all cursor-pointer ${
                   active
-                    ? 'bg-[#ff2e9c] border-[#ff2e9c] text-white'
-                    : 'bg-[#1a1d2a] border-[#2f3346] text-gray-300'
+                    ? 'bg-gradient-to-r from-neon-purple to-neon-cyan text-white shadow-lg shadow-neon-purple/20'
+                    : 'bg-dark-card border border-dark-border text-gray-400 hover:border-neon-purple/50 hover:text-white'
                 }`}
               >
                 {filter.label}
@@ -132,9 +123,9 @@ export default function MapView() {
             )
           })}
         </div>
-      </header>
+      </div>
 
-      <main className="relative flex-1 min-h-0">
+      <div className="relative flex-1 min-h-0">
         <MapContainer
           center={PARIS_CENTER}
           zoom={11}
@@ -142,8 +133,8 @@ export default function MapView() {
           style={{ height: '100%', width: '100%' }}
         >
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
           />
           {visibleMarkers.map((marker) => (
             <Marker
@@ -153,26 +144,7 @@ export default function MapView() {
             />
           ))}
         </MapContainer>
-      </main>
-
-      <nav className="shrink-0 bg-[#0d0f16] border-t border-[#212436] px-2 py-2">
-        <div className="grid grid-cols-3 gap-1 text-center text-xs">
-          <Link to="/" className="flex flex-col items-center py-1 text-gray-400">
-            <span className="text-lg">🎟️</span>
-            <span>Offres</span>
-          </Link>
-
-          <div className="flex flex-col items-center py-1 text-[#ff2e9c]">
-            <span className="text-lg">📍</span>
-            <span>Carte</span>
-          </div>
-
-          <Link to="/account" className="flex flex-col items-center py-1 text-gray-400">
-            <span className="text-lg">👤</span>
-            <span>Compte</span>
-          </Link>
-        </div>
-      </nav>
+      </div>
     </div>
   )
 }

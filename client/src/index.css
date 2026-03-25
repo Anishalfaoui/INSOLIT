@@ -34,11 +34,11 @@ body {
   height: 34px;
   border-radius: 17px 17px 17px 0;
   transform: rotate(-45deg);
-  background: linear-gradient(160deg, #ff58b5, #ff2e9c);
+  background: linear-gradient(160deg, var(--color-neon-purple), var(--color-neon-cyan));
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 14px rgba(255, 46, 156, 0.45);
+  box-shadow: 0 6px 14px rgba(168, 85, 247, 0.45);
 }
 
 .insolit-pin span {
