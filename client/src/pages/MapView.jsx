@@ -7,74 +7,6 @@ import 'leaflet/dist/leaflet.css'
 
 const PARIS_CENTER = [48.8566, 2.3522]
 
-const FILTERS = [
-  { key: 'all', label: '✨ Toutes' },
-  { key: 'restaurants', label: '🍔 Restaurants' },
-  { key: 'cadeaux', label: '🎁 Cadeaux' },
-  { key: 'activites', label: '🎱 Activités' },
-]
-
-const EMOJI_BY_TYPE = {
-  restaurants: '🍔',
-  cadeaux: '💈',
-  activites: '🎱',
-  nightlife: '🍸',
-}
-
-function buildDenseMarkers() {
-  const markers = []
-  const rings = [
-    { radius: 0.012, count: 20 },
-    { radius: 0.02, count: 24 },
-    { radius: 0.028, count: 20 },
-    { radius: 0.04, count: 14 },
-  ]
-
-  const types = ['restaurants', 'activites', 'nightlife', 'cadeaux']
-
-  let idx = 0
-  for (const ring of rings) {
-    for (let i = 0; i < ring.count; i++) {
-      const angle = (2 * Math.PI * i) / ring.count
-      const lat = PARIS_CENTER[0] + Math.sin(angle) * ring.radius
-      const lng = PARIS_CENTER[1] + Math.cos(angle) * ring.radius * 1.45
-      const type = types[idx % types.length]
-      const emoji = EMOJI_BY_TYPE[type]
-      markers.push({
-        id: `${ring.radius}-${i}`,
-        lat,
-        lng,
-        type,
-        emoji,
-        name: type === 'restaurants' ? 'Burger insolite' : type === 'cadeaux' ? 'Barbier premium' : type === 'nightlife' ? 'Soiree cocktail' : 'Activite urbaine',
-      })
-      idx++
-    }
-  }
-
-  // Outer suburban markers for Nanterre / Saint-Denis / Creteil / etc.
-  markers.push(
-    { id: 'nanterre', lat: 48.8924, lng: 2.2066, type: 'activites', emoji: '🎱', name: 'Nanterre Fun' },
-    { id: 'stdenis', lat: 48.9362, lng: 2.3574, type: 'restaurants', emoji: '🍔', name: 'Saint-Denis Food' },
-    { id: 'creteil', lat: 48.7904, lng: 2.4556, type: 'nightlife', emoji: '🍸', name: 'Creteil Night' },
-    { id: 'boulogne', lat: 48.8397, lng: 2.2399, type: 'cadeaux', emoji: '💈', name: 'Boulogne Style' },
-    { id: 'montreuil', lat: 48.8638, lng: 2.4485, type: 'restaurants', emoji: '🍔', name: 'Montreuil Burger' }
-  )
-
-  return markers
-}
-
-function getFilterType(promo) {
-  const category = (promo.category || '').toLowerCase()
-
-  if (category === 'food') return 'restaurants'
-  if (category === 'mode' || category === 'beaute' || category === 'beauté' || category === 'tech') {
-    return 'cadeaux'
-  }
-
-  return 'activites'
-}
-
 const iconCache = new Map()
 function getPinIcon(emoji) {
   if (iconCache.has(emoji)) {
@@ -109,42 +41,32 @@ export default function MapView() {
   }, [])
 
   const allMarkers = useMemo(() => {
-    const validPromos = promos.filter(
-      (promo) => Number.isFinite(promo.latitude) && Number.isFinite(promo.longitude)
-    )
-
-    if (validPromos.length > 0) {
-      return validPromos.map((promo) => {
-        const type = getFilterType(promo)
-        return {
-          id: promo.id,
-          promoId: promo.id,
-          lat: promo.latitude,
-          lng: promo.longitude,
-          type,
-          emoji: promo.category_icon || EMOJI_BY_TYPE[type] || '🎉',
-          name: promo.title,
-          merchant: promo.merchants?.name || 'Marchand',
-          category: promo.category || 'Offre',
-        }
-      })
-    }
-
-    return buildDenseMarkers()
+    return promos
+      .filter((promo) => Number.isFinite(promo.latitude) && Number.isFinite(promo.longitude))
+      .map((promo) => ({
+        id: promo.id,
+        promoId: promo.id,
+        lat: promo.latitude,
+        lng: promo.longitude,
+        emoji: promo.category_icon || '🎉',
+        name: promo.title,
+        merchant: promo.merchants?.name || 'Marchand',
+        category: promo.category || 'Offre',
+      }))
   }, [promos])
+
+  const filters = useMemo(() => {
+    const categories = [...new Set(allMarkers.map((marker) => marker.category).filter(Boolean))]
+    return [
+      { key: 'all', label: '✨ Toutes' },
+      ...categories.map((category) => ({ key: category, label: category })),
+    ]
+  }, [allMarkers])
 
   const visibleMarkers = useMemo(() => {
     const q = query.trim().toLowerCase()
     return allMarkers.filter((marker) => {
-      let filterMatch = true
-
-      if (activeFilter !== 'all') {
-        filterMatch =
-          activeFilter === 'activites'
-            ? marker.type === 'activites' || marker.type === 'nightlife'
-            : marker.type === activeFilter
-      }
-
+      const filterMatch = activeFilter === 'all' ? true : marker.category === activeFilter
       const queryMatch = !q || marker.name.toLowerCase().includes(q)
       return filterMatch && queryMatch
     })
@@ -169,7 +91,7 @@ export default function MapView() {
         />
 
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
-          {FILTERS.map((filter) => {
+          {filters.map((filter) => {
             const active = activeFilter === filter.key
             return (
               <button
