@@ -1,11 +1,40 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { MapContainer, Marker, TileLayer } from 'react-leaflet'
+import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet'
 import { Popup } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
 const PARIS_CENTER = [48.8566, 2.3522]
+const NEAR_ME_RADIUS_KM = 3
+
+function haversineDistanceKm(from, to) {
+  const toRad = (deg) => (deg * Math.PI) / 180
+  const earthRadiusKm = 6371
+
+  const dLat = toRad(to.lat - from.lat)
+  const dLng = toRad(to.lng - from.lng)
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(from.lat)) *
+      Math.cos(toRad(to.lat)) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2)
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  return earthRadiusKm * c
+}
+
+function MapAutoCenter({ center, zoom }) {
+  const map = useMap()
+
+  useEffect(() => {
+    map.setView(center, zoom)
+  }, [map, center, zoom])
+
+  return null
+}
 
 const iconCache = new Map()
 function getPinIcon(emoji) {
@@ -28,6 +57,10 @@ export default function MapView() {
   const [query, setQuery] = useState('')
   const [activeFilter, setActiveFilter] = useState('all')
   const [promos, setPromos] = useState([])
+  const [isNearMeActive, setIsNearMeActive] = useState(false)
+  const [isLocating, setIsLocating] = useState(false)
+  const [geoError, setGeoError] = useState('')
+  const [userLocation, setUserLocation] = useState(null)
 
   useEffect(() => {
     fetch('/api/promos')
@@ -63,24 +96,76 @@ export default function MapView() {
     ]
   }, [allMarkers])
 
+  function handleNearMeClick() {
+    if (isNearMeActive) {
+      setIsNearMeActive(false)
+      setGeoError('')
+      return
+    }
+
+    if (!navigator.geolocation) {
+      setGeoError('La geolocalisation est indisponible sur cet appareil.')
+      return
+    }
+
+    setIsLocating(true)
+    setGeoError('')
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        })
+        setIsNearMeActive(true)
+        setIsLocating(false)
+      },
+      () => {
+        setGeoError('Autorise la geolocalisation pour utiliser Near me now.')
+        setIsLocating(false)
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 12000,
+        maximumAge: 60000,
+      }
+    )
+  }
+
   const visibleMarkers = useMemo(() => {
     const q = query.trim().toLowerCase()
     return allMarkers.filter((marker) => {
       const filterMatch = activeFilter === 'all' ? true : marker.category === activeFilter
       const queryMatch = !q || marker.name.toLowerCase().includes(q)
-      return filterMatch && queryMatch
+
+      let nearMatch = true
+      if (isNearMeActive && userLocation) {
+        nearMatch =
+          haversineDistanceKm(
+            { lat: userLocation.lat, lng: userLocation.lng },
+            { lat: marker.lat, lng: marker.lng }
+          ) <= NEAR_ME_RADIUS_KM
+      }
+
+      return filterMatch && queryMatch && nearMatch
     })
-  }, [allMarkers, activeFilter, query])
+  }, [allMarkers, activeFilter, query, isNearMeActive, userLocation])
+
+  const mapCenter = useMemo(() => {
+    if (isNearMeActive && userLocation) {
+      return [userLocation.lat, userLocation.lng]
+    }
+
+    if (visibleMarkers[0]) {
+      return [visibleMarkers[0].lat, visibleMarkers[0].lng]
+    }
+
+    return PARIS_CENTER
+  }, [isNearMeActive, userLocation, visibleMarkers])
 
   return (
     <div className="h-[calc(100dvh-5rem)] md:h-[calc(100dvh-4rem)] w-full bg-[#0d0e14] text-white flex flex-col overflow-hidden">
       <header className="px-4 pt-4 pb-3 shrink-0 md:max-w-7xl md:mx-auto md:w-full md:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-3">
-          <h1 className="text-3xl font-black tracking-tight text-[#ff2e9c]">insolit</h1>
-          <button className="text-2xl text-[#ff2e9c]" aria-label="Favoris">
-            ❤
-          </button>
-        </div>
 
         <input
           type="text"
@@ -89,6 +174,26 @@ export default function MapView() {
           placeholder="Ex : Burger, soirée..."
           className="w-full rounded-2xl bg-[#191b26] border border-[#2a2d3d] px-4 py-3 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-[#ff2e9c]"
         />
+
+        <div className="mt-3 flex items-center gap-2">
+          <button
+            onClick={handleNearMeClick}
+            disabled={isLocating}
+            className={`rounded-full px-4 py-2 text-sm font-semibold border transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed ${
+              isNearMeActive
+                ? 'bg-[#ff2e9c] border-[#ff2e9c] text-white'
+                : 'bg-[#1a1d2a] border-[#2f3346] text-gray-300'
+            }`}
+          >
+            {isLocating ? 'Localisation...' : isNearMeActive ? 'Near me now ON' : '📍 Near me now'}
+          </button>
+
+          {isNearMeActive && (
+            <span className="text-xs text-gray-400">Rayon: {NEAR_ME_RADIUS_KM} km</span>
+          )}
+        </div>
+
+        {geoError && <p className="mt-2 text-xs text-red-400">{geoError}</p>}
 
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
           {filters.map((filter) => {
@@ -113,15 +218,23 @@ export default function MapView() {
       <main className="relative flex-1 min-h-0 px-4 pb-4 md:px-6 lg:px-8">
         <div className="h-full overflow-hidden rounded-2xl border border-[#2a2d3d] shadow-[0_12px_30px_rgba(0,0,0,0.35)]">
           <MapContainer
-            center={visibleMarkers[0] ? [visibleMarkers[0].lat, visibleMarkers[0].lng] : PARIS_CENTER}
+            center={mapCenter}
             zoom={11}
             scrollWheelZoom
             style={{ height: '100%', width: '100%' }}
           >
+            <MapAutoCenter center={mapCenter} zoom={isNearMeActive && userLocation ? 13 : 11} />
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
+            {isNearMeActive && userLocation && (
+              <Marker position={[userLocation.lat, userLocation.lng]} icon={getPinIcon('📍')}>
+                <Popup>
+                  <p className="font-semibold text-[#111827]">Vous etes ici</p>
+                </Popup>
+              </Marker>
+            )}
             {visibleMarkers.map((marker) => (
               <Marker
                 key={marker.id}
@@ -150,6 +263,9 @@ export default function MapView() {
             ))}
           </MapContainer>
         </div>
+        {isNearMeActive && visibleMarkers.length === 0 && (
+          <p className="mt-2 text-xs text-gray-400">Aucune offre trouvee dans un rayon de {NEAR_ME_RADIUS_KM} km.</p>
+        )}
       </main>
     </div>
   )
