@@ -23,18 +23,26 @@ export default function Navbar() {
           <div className="flex items-center gap-4">
             {user ? (
               <>
-                <NavLink to="/" className={navLinkClass} end>
-                  Bons Plans
-                </NavLink>
-                <NavLink to="/favorites" className={navLinkClass}>
-                  Favoris
-                </NavLink>
-                <NavLink to="/map" className={navLinkClass}>
-                  Carte
-                </NavLink>
-                <NavLink to="/account" className={navLinkClass}>
-                  Compte
-                </NavLink>
+                {user.is_admin ? (
+                  <NavLink to="/admin" className={navLinkClass}>
+                    ⚙️ Admin
+                  </NavLink>
+                ) : (
+                  <>
+                    <NavLink to="/" className={navLinkClass} end>
+                      Bons Plans
+                    </NavLink>
+                    <NavLink to="/favorites" className={navLinkClass}>
+                      Favoris
+                    </NavLink>
+                    <NavLink to="/map" className={navLinkClass}>
+                      Carte
+                    </NavLink>
+                    <NavLink to="/account" className={navLinkClass}>
+                      Compte
+                    </NavLink>
+                  </>
+                )}
                 <button
                   onClick={signOut}
                   className="text-sm bg-dark-surface border border-dark-border px-4 py-2 rounded-lg hover:border-neon-purple/50 transition-colors cursor-pointer"
@@ -56,47 +64,67 @@ export default function Navbar() {
 
       {user ? (
         <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-dark-border bg-dark-card/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)]">
-          <div className="grid grid-cols-4 px-1 py-1">
-            <NavLink
-              to="/"
-              end
-              className={({ isActive }) =>
-                `flex flex-col items-center rounded-lg py-2 text-xs transition-colors ${isActive ? 'text-neon-cyan bg-dark-surface' : 'text-gray-400'}`
-              }
-            >
-              <span className="text-base">🎟️</span>
-              <span>Offres</span>
-            </NavLink>
-
-            <NavLink
-              to="/favorites"
-              className={({ isActive }) =>
-                `flex flex-col items-center rounded-lg py-2 text-xs transition-colors ${isActive ? 'text-neon-cyan bg-dark-surface' : 'text-gray-400'}`
-              }
-            >
-              <span className="text-base">❤️</span>
-              <span>Favoris</span>
-            </NavLink>
-
-            <NavLink
-              to="/map"
-              className={({ isActive }) =>
-                `flex flex-col items-center rounded-lg py-2 text-xs transition-colors ${isActive ? 'text-neon-cyan bg-dark-surface' : 'text-gray-400'}`
-              }
-            >
-              <span className="text-base">📍</span>
-              <span>Carte</span>
-            </NavLink>
-
-            <NavLink
-              to="/account"
-              className={({ isActive }) =>
-                `flex flex-col items-center rounded-lg py-2 text-xs transition-colors ${isActive ? 'text-neon-cyan bg-dark-surface' : 'text-gray-400'}`
-              }
-            >
-              <span className="text-base">👤</span>
-              <span>Compte</span>
-            </NavLink>
+          <div className={`grid ${user.is_admin ? 'grid-cols-2' : 'grid-cols-4'} px-1 py-1`}>
+            {user.is_admin ? (
+              <>
+                <NavLink
+                  to="/admin"
+                  className={({ isActive }) =>
+                    `flex flex-col items-center rounded-lg py-2 text-xs transition-colors ${isActive ? 'text-neon-cyan bg-dark-surface' : 'text-gray-400'}`
+                  }
+                >
+                  <span className="text-base">⚙️</span>
+                  <span>Admin</span>
+                </NavLink>
+                <button
+                  onClick={signOut}
+                  className="flex flex-col items-center rounded-lg py-2 text-xs transition-colors text-gray-400 cursor-pointer"
+                >
+                  <span className="text-base">🚪</span>
+                  <span>Déco</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <NavLink
+                  to="/"
+                  end
+                  className={({ isActive }) =>
+                    `flex flex-col items-center rounded-lg py-2 text-xs transition-colors ${isActive ? 'text-neon-cyan bg-dark-surface' : 'text-gray-400'}`
+                  }
+                >
+                  <span className="text-base">🎟️</span>
+                  <span>Offres</span>
+                </NavLink>
+                <NavLink
+                  to="/favorites"
+                  className={({ isActive }) =>
+                    `flex flex-col items-center rounded-lg py-2 text-xs transition-colors ${isActive ? 'text-neon-cyan bg-dark-surface' : 'text-gray-400'}`
+                  }
+                >
+                  <span className="text-base">❤️</span>
+                  <span>Favoris</span>
+                </NavLink>
+                <NavLink
+                  to="/map"
+                  className={({ isActive }) =>
+                    `flex flex-col items-center rounded-lg py-2 text-xs transition-colors ${isActive ? 'text-neon-cyan bg-dark-surface' : 'text-gray-400'}`
+                  }
+                >
+                  <span className="text-base">📍</span>
+                  <span>Carte</span>
+                </NavLink>
+                <NavLink
+                  to="/account"
+                  className={({ isActive }) =>
+                    `flex flex-col items-center rounded-lg py-2 text-xs transition-colors ${isActive ? 'text-neon-cyan bg-dark-surface' : 'text-gray-400'}`
+                  }
+                >
+                  <span className="text-base">👤</span>
+                  <span>Compte</span>
+                </NavLink>
+              </>
+            )}
           </div>
         </nav>
       ) : (
