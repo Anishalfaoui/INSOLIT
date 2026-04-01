@@ -1,4 +1,12 @@
 import { Link, NavLink, useLocation } from 'react-router-dom'
+import {
+  Heart,
+  LogOut,
+  MapPin,
+  Settings,
+  Ticket,
+  User,
+} from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { usePartner } from '../context/usePartner'
 import ThemeToggle from './ThemeToggle'
@@ -19,28 +27,33 @@ export default function Navbar() {
   ].includes(pathname)
 
   function navPillClass({ isActive }) {
-    return `text-sm rounded-lg border px-3 py-2 transition-colors ${
+    return `inline-flex items-center gap-1.5 text-sm rounded-lg border px-3 py-2 transition-colors ${
       isActive
-        ? 'border-neon-cyan text-neon-cyan bg-neon-cyan/10'
-        : 'border-dark-border bg-dark-surface text-slate-600 dark:text-gray-300 hover:border-neon-purple/50'
+        ? 'border-insolit-pink bg-insolit-pink/10 text-insolit-pink'
+        : 'border-dark-border bg-dark-surface text-slate-600 hover:border-insolit-pink/35 dark:text-gray-300'
     }`
   }
 
   const signOutPillClass =
-    'text-sm rounded-lg border border-dark-border bg-dark-surface px-3 py-2 text-slate-600 dark:text-gray-300 hover:border-neon-purple/50 transition-colors cursor-pointer'
+    'inline-flex items-center gap-1.5 text-sm rounded-lg border border-dark-border bg-dark-surface px-3 py-2 text-slate-600 transition-colors hover:border-insolit-pink/35 dark:text-gray-300 cursor-pointer'
+
+  const mobileNavClass = (isActive) =>
+    `mx-0.5 flex flex-col items-center gap-0.5 rounded-lg border py-2 text-xs transition-colors ${
+      isActive
+        ? 'border-insolit-pink bg-insolit-pink/10 text-insolit-pink'
+        : 'border-dark-border bg-dark-surface text-slate-500 dark:text-gray-400'
+    }`
 
   return (
     <>
       <div className="fixed top-3 right-3 z-[60] md:hidden">
         <ThemeToggle />
       </div>
-      <nav className="hidden md:block border-b border-dark-border bg-dark-card/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+      <nav className="sticky top-0 z-50 hidden border-b border-dark-border bg-dark-card/80 backdrop-blur-md md:block">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-2">
-            <span className="text-2xl font-bold bg-linear-to-r from-neon-purple to-neon-cyan bg-clip-text text-transparent">
-              INSOLIT
-            </span>
-            <span className="text-xs bg-neon-purple/20 text-neon-purple px-2 py-0.5 rounded-full font-medium">
+            <span className="text-2xl font-bold lowercase tracking-tight text-insolit-pink">insolit</span>
+            <span className="rounded-full bg-insolit-pink/15 px-2 py-0.5 text-xs font-medium text-insolit-pink">
               -26 ans
             </span>
           </Link>
@@ -50,25 +63,31 @@ export default function Navbar() {
               <>
                 {user.is_admin ? (
                   <NavLink to="/admin" className={navPillClass}>
-                    ⚙️ Admin
+                    <Settings className="h-4 w-4 shrink-0 opacity-90" strokeWidth={2} aria-hidden />
+                    Admin
                   </NavLink>
                 ) : (
                   <>
                     <NavLink to="/" className={navPillClass} end>
-                      Bons Plans
+                      <Ticket className="h-4 w-4 shrink-0 opacity-90" strokeWidth={2} aria-hidden />
+                      Bons plans
                     </NavLink>
                     <NavLink to="/favorites" className={navPillClass}>
+                      <Heart className="h-4 w-4 shrink-0 opacity-90" strokeWidth={2} aria-hidden />
                       Favoris
                     </NavLink>
                     <NavLink to="/map" className={navPillClass}>
+                      <MapPin className="h-4 w-4 shrink-0 opacity-90" strokeWidth={2} aria-hidden />
                       Carte
                     </NavLink>
                     <NavLink to="/account" className={navPillClass}>
+                      <User className="h-4 w-4 shrink-0 opacity-90" strokeWidth={2} aria-hidden />
                       Compte
                     </NavLink>
                   </>
                 )}
                 <button type="button" onClick={signOut} className={signOutPillClass}>
+                  <LogOut className="h-4 w-4 shrink-0 opacity-90" strokeWidth={2} aria-hidden />
                   Déconnexion
                 </button>
               </>
@@ -87,7 +106,7 @@ export default function Navbar() {
             ) : onLoginPage ? (
               <Link
                 to="/register"
-                className="text-sm bg-linear-to-r from-neon-purple to-neon-cyan px-4 py-2 rounded-lg font-medium text-white hover:opacity-90 transition-opacity"
+                className="rounded-full bg-insolit-pink px-5 py-2 text-sm font-semibold text-white transition-opacity hover:bg-insolit-pink-hover hover:opacity-95"
               >
                 Inscription
               </Link>
@@ -95,7 +114,7 @@ export default function Navbar() {
               !isAuthPage && (
                 <Link
                   to="/login"
-                  className="text-sm bg-linear-to-r from-neon-purple to-neon-cyan px-4 py-2 rounded-lg font-medium text-white hover:opacity-90 transition-opacity"
+                  className="rounded-full bg-insolit-pink px-5 py-2 text-sm font-semibold text-white transition-opacity hover:bg-insolit-pink-hover hover:opacity-95"
                 >
                   Connexion
                 </Link>
@@ -106,65 +125,42 @@ export default function Navbar() {
       </nav>
 
       {user ? (
-        <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-dark-border bg-dark-card/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)]">
-          <div className={`grid ${user.is_admin ? 'grid-cols-2' : 'grid-cols-4'} px-1 py-1`}>
+        <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-dark-border bg-dark-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden">
+          <div className={`grid px-1 py-1 ${user.is_admin ? 'grid-cols-2' : 'grid-cols-4'}`}>
             {user.is_admin ? (
               <>
                 <NavLink
                   to="/admin"
-                  className={({ isActive }) =>
-                    `mx-0.5 flex flex-col items-center rounded-lg border py-2 text-xs transition-colors ${isActive ? 'border-neon-cyan bg-neon-cyan/10 text-neon-cyan' : 'border-dark-border bg-dark-surface text-slate-500 dark:text-gray-400'}`
-                  }
+                  className={({ isActive }) => mobileNavClass(isActive)}
                 >
-                  <span className="text-base">⚙️</span>
+                  <Settings className="h-5 w-5" strokeWidth={2} aria-hidden />
                   <span>Admin</span>
                 </NavLink>
                 <button
                   type="button"
                   onClick={signOut}
-                  className="mx-0.5 flex flex-col items-center rounded-lg border border-dark-border bg-dark-surface py-2 text-xs text-slate-500 transition-colors cursor-pointer dark:text-gray-400"
+                  className="mx-0.5 flex flex-col items-center gap-0.5 rounded-lg border border-dark-border bg-dark-surface py-2 text-xs text-slate-500 transition-colors cursor-pointer dark:text-gray-400"
                 >
-                  <span className="text-base">🚪</span>
+                  <LogOut className="h-5 w-5" strokeWidth={2} aria-hidden />
                   <span>Déco</span>
                 </button>
               </>
             ) : (
               <>
-                <NavLink
-                  to="/"
-                  end
-                  className={({ isActive }) =>
-                    `mx-0.5 flex flex-col items-center rounded-lg border py-2 text-xs transition-colors ${isActive ? 'border-neon-cyan bg-neon-cyan/10 text-neon-cyan' : 'border-dark-border bg-dark-surface text-slate-500 dark:text-gray-400'}`
-                  }
-                >
-                  <span className="text-base">🎟️</span>
+                <NavLink to="/" end className={({ isActive }) => mobileNavClass(isActive)}>
+                  <Ticket className="h-5 w-5" strokeWidth={2} aria-hidden />
                   <span>Offres</span>
                 </NavLink>
-                <NavLink
-                  to="/favorites"
-                  className={({ isActive }) =>
-                    `mx-0.5 flex flex-col items-center rounded-lg border py-2 text-xs transition-colors ${isActive ? 'border-neon-cyan bg-neon-cyan/10 text-neon-cyan' : 'border-dark-border bg-dark-surface text-slate-500 dark:text-gray-400'}`
-                  }
-                >
-                  <span className="text-base">❤️</span>
+                <NavLink to="/favorites" className={({ isActive }) => mobileNavClass(isActive)}>
+                  <Heart className="h-5 w-5" strokeWidth={2} aria-hidden />
                   <span>Favoris</span>
                 </NavLink>
-                <NavLink
-                  to="/map"
-                  className={({ isActive }) =>
-                    `mx-0.5 flex flex-col items-center rounded-lg border py-2 text-xs transition-colors ${isActive ? 'border-neon-cyan bg-neon-cyan/10 text-neon-cyan' : 'border-dark-border bg-dark-surface text-slate-500 dark:text-gray-400'}`
-                  }
-                >
-                  <span className="text-base">📍</span>
+                <NavLink to="/map" className={({ isActive }) => mobileNavClass(isActive)}>
+                  <MapPin className="h-5 w-5" strokeWidth={2} aria-hidden />
                   <span>Carte</span>
                 </NavLink>
-                <NavLink
-                  to="/account"
-                  className={({ isActive }) =>
-                    `mx-0.5 flex flex-col items-center rounded-lg border py-2 text-xs transition-colors ${isActive ? 'border-neon-cyan bg-neon-cyan/10 text-neon-cyan' : 'border-dark-border bg-dark-surface text-slate-500 dark:text-gray-400'}`
-                  }
-                >
-                  <span className="text-base">👤</span>
+                <NavLink to="/account" className={({ isActive }) => mobileNavClass(isActive)}>
+                  <User className="h-5 w-5" strokeWidth={2} aria-hidden />
                   <span>Compte</span>
                 </NavLink>
               </>
@@ -203,7 +199,7 @@ export default function Navbar() {
             </Link>
             <Link
               to="/register"
-              className="text-center rounded-lg bg-linear-to-r from-neon-purple to-neon-cyan py-2 text-sm font-semibold text-white"
+              className="rounded-full bg-insolit-pink py-2 text-center text-sm font-semibold text-white hover:bg-insolit-pink-hover"
             >
               Inscription
             </Link>

@@ -1,3 +1,4 @@
+import { Moon, Sun } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
 
 export default function ThemeToggle({ className = '' }) {
@@ -7,13 +8,15 @@ export default function ThemeToggle({ className = '' }) {
     <button
       type="button"
       onClick={() => setTheme(resolved === 'dark' ? 'light' : 'dark')}
-      className={`text-sm transition-colors cursor-pointer text-slate-600 hover:text-neon-cyan dark:text-gray-300 ${className}`}
+      className={`flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-slate-600 transition-colors hover:bg-dark-surface hover:text-insolit-pink dark:text-gray-300 dark:hover:text-insolit-pink ${className}`}
       aria-label={resolved === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'}
       title={resolved === 'dark' ? 'Mode clair' : 'Mode sombre'}
     >
-      <span className="text-base leading-none" aria-hidden>
-        {resolved === 'dark' ? '☀️' : '🌙'}
-      </span>
+      {resolved === 'dark' ? (
+        <Sun className="h-5 w-5" strokeWidth={2} aria-hidden />
+      ) : (
+        <Moon className="h-5 w-5" strokeWidth={2} aria-hidden />
+      )}
     </button>
   )
 }

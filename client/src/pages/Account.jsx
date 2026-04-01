@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { UserRound } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 function toDataUrl(file) {
@@ -76,106 +77,111 @@ export default function Account() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold mb-6 text-theme">Mon compte</h1>
+    <div className="page-shell min-h-[calc(100dvh-5rem)] md:min-h-[calc(100dvh-4rem)]">
+      <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+        <h1 className="mb-2 text-3xl font-bold text-theme">
+          <span className="text-insolit-pink">Mon</span> compte
+        </h1>
+        <p className="mb-6 text-sm text-theme-muted">Photo, coordonnées et préférences</p>
 
-      <div className="bg-dark-card border border-dark-border rounded-2xl p-6 sm:p-8">
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg p-3 mb-4">
-            {error}
-          </div>
-        )}
-        {success && (
-          <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm rounded-lg p-3 mb-4">
-            {success}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="flex items-center gap-4">
-            <div className="w-20 h-20 rounded-full overflow-hidden border border-dark-border bg-dark-surface shrink-0 flex items-center justify-center">
-              {avatarUrl ? (
-                <img src={avatarUrl} alt="Photo de profil" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-3xl">👤</span>
-              )}
+        <div className="rounded-2xl border border-dark-border bg-dark-card p-6 sm:p-8">
+          {error && (
+            <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-600 dark:text-red-400">
+              {error}
             </div>
-            <div className="flex-1">
-              <label className="block text-sm text-theme-muted mb-2">Photo de profil</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="block w-full text-sm text-slate-600 file:mr-3 file:px-4 file:py-2 file:rounded-lg file:border-0 file:bg-dark-surface file:text-slate-800 dark:text-gray-300 dark:file:text-gray-200"
-              />
-              <p className="text-xs text-theme-subtle mt-2">PNG/JPG/WEBP - max 2MB</p>
+          )}
+          {success && (
+            <div className="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-700 dark:text-emerald-400">
+              {success}
             </div>
-          </div>
+          )}
 
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Nom complet</label>
-            <input
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              required
-              className="w-full bg-dark-surface border border-dark-border rounded-lg px-4 py-3 text-white focus:outline-none focus:border-neon-purple"
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="flex items-center gap-4">
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-dark-border bg-dark-surface">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Photo de profil" className="h-full w-full object-cover" />
+                ) : (
+                  <UserRound className="h-10 w-10 text-insolit-pink/60" strokeWidth={1.5} aria-hidden />
+                )}
+              </div>
+              <div className="flex-1">
+                <label className="mb-2 block text-sm text-theme-muted">Photo de profil</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="block w-full text-sm text-slate-600 file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-insolit-pink/10 file:px-4 file:py-2 file:text-sm file:font-medium file:text-insolit-pink dark:text-gray-300"
+                />
+                <p className="mt-2 text-xs text-theme-subtle">PNG / JPG / WEBP — max 2 Mo</p>
+              </div>
+            </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-theme-muted mb-1">Date de naissance</label>
+              <label className="mb-1 block text-sm text-theme-muted">Nom complet</label>
               <input
-                type="date"
-                value={birthDate}
-                onChange={(e) => setBirthDate(e.target.value)}
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
                 required
                 className="input-theme"
               />
             </div>
 
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="mb-1 block text-sm text-theme-muted">Date de naissance</label>
+                <input
+                  type="date"
+                  value={birthDate}
+                  onChange={(e) => setBirthDate(e.target.value)}
+                  required
+                  className="input-theme"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm text-theme-muted">Téléphone</label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  required
+                  className="input-theme"
+                />
+              </div>
+            </div>
+
             <div>
-              <label className="block text-sm text-theme-muted mb-1">Téléphone</label>
+              <label className="mb-1 block text-sm text-theme-muted">Ville</label>
               <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
                 required
                 className="input-theme"
               />
             </div>
-          </div>
 
-          <div>
-            <label className="block text-sm text-theme-muted mb-1">Ville</label>
-            <input
-              type="text"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              required
-              className="input-theme"
-            />
-          </div>
+            <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+              <button
+                type="submit"
+                disabled={saving}
+                className="w-full cursor-pointer rounded-full bg-insolit-pink px-6 py-3 text-sm font-semibold text-white transition-opacity hover:bg-insolit-pink-hover disabled:opacity-60 sm:w-auto"
+              >
+                {saving ? 'Enregistrement…' : 'Sauvegarder'}
+              </button>
 
-          <div className="flex flex-col sm:flex-row gap-3 pt-2">
-            <button
-              type="submit"
-              disabled={saving}
-              className="w-full sm:w-auto px-6 py-3 rounded-lg text-white font-medium bg-linear-to-r from-neon-purple to-neon-cyan hover:opacity-90 disabled:opacity-60 cursor-pointer"
-            >
-              {saving ? 'Enregistrement...' : 'Sauvegarder'}
-            </button>
-
-            <button
-              type="button"
-              onClick={signOut}
-              className="w-full sm:w-auto px-6 py-3 rounded-lg font-medium border border-dark-border bg-dark-surface text-slate-700 hover:border-neon-purple/50 transition-colors cursor-pointer dark:text-gray-200"
-            >
-              Déconnexion
-            </button>
-          </div>
-        </form>
+              <button
+                type="button"
+                onClick={signOut}
+                className="w-full cursor-pointer rounded-full border border-dark-border bg-dark-surface px-6 py-3 text-sm font-medium text-slate-700 transition-colors hover:border-insolit-pink/40 dark:text-gray-200"
+              >
+                Déconnexion
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   )

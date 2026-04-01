@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { ArrowLeft, Heart } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useFavorites } from '../context/FavoritesContext'
+import CategoryGlyph from '../components/CategoryGlyph'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 
-// Fix leaflet default icon
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
@@ -50,110 +51,125 @@ export default function PromoDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-neon-purple border-t-transparent rounded-full animate-spin" />
+      <div className="page-shell flex min-h-[50vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-insolit-pink border-t-transparent" />
       </div>
     )
   }
 
   if (!promo) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+      <div className="page-shell flex min-h-[50vh] flex-col items-center justify-center gap-4 px-4">
         <p className="text-xl text-theme-muted">Promo introuvable</p>
-        <Link to="/" className="text-neon-purple hover:underline">Retour</Link>
+        <Link to="/" className="font-medium text-insolit-pink hover:underline">
+          Retour à l'accueil
+        </Link>
       </div>
     )
   }
 
   const hasCoords = Number.isFinite(promo.latitude) && Number.isFinite(promo.longitude)
+  const favorited = isFavorite(promo.id)
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <Link to="/" className="text-neon-cyan hover:underline text-sm mb-6 inline-block">
-        ← Retour aux bons plans
-      </Link>
+    <div className="page-shell">
+      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+        <Link
+          to="/"
+          className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-insolit-pink hover:underline"
+        >
+          <ArrowLeft className="h-4 w-4" strokeWidth={2} aria-hidden />
+          Retour aux bons plans
+        </Link>
 
-      <div className="bg-dark-card border border-dark-border rounded-2xl overflow-hidden">
-        {promo.image_url && (
-          <div className="h-64 overflow-hidden">
-            <img src={promo.image_url} alt={promo.title} className="w-full h-full object-cover" />
-          </div>
-        )}
+        <div className="overflow-hidden rounded-2xl border border-dark-border bg-dark-card shadow-lg shadow-pink-500/5">
+          {promo.image_url && (
+            <div className="h-64 overflow-hidden">
+              <img src={promo.image_url} alt={promo.title} className="h-full w-full object-cover" />
+            </div>
+          )}
 
-        <div className="p-6 sm:p-8">
-          <div className="flex flex-wrap items-center gap-3 mb-4">
-            <span className="text-sm font-medium text-neon-cyan bg-neon-cyan/10 px-3 py-1 rounded-full">
-              {promo.category_icon ? `${promo.category_icon} ` : ''}{promo.category || 'Sans categorie'}
-            </span>
-            {promo.is_exclusive && (
-              <span className="text-sm font-bold bg-gradient-to-r from-neon-purple to-neon-cyan text-white px-3 py-1 rounded-full">
-                Exclusif
+          <div className="p-6 sm:p-8">
+            <div className="mb-4 flex flex-wrap items-center gap-3">
+              <span className="inline-flex items-center gap-2 rounded-full bg-insolit-pink/10 px-3 py-1 text-sm font-medium text-insolit-pink">
+                <CategoryGlyph categoryLabel={promo.category} className="h-4 w-4" strokeWidth={2} />
+                {promo.category || 'Sans catégorie'}
               </span>
-            )}
-          </div>
-
-          <div className="flex items-start justify-between gap-4 mb-2">
-            <h1 className="text-3xl font-bold text-theme">{promo.title}</h1>
-            <button
-              onClick={() => toggleFavorite(promo.id)}
-              aria-label={isFavorite(promo.id) ? 'Retirer des favoris' : 'Ajouter aux favoris'}
-              className="shrink-0 w-11 h-11 flex items-center justify-center rounded-full bg-dark-surface border border-dark-border hover:border-neon-purple/50 transition-colors cursor-pointer"
-            >
-              <span className="text-xl leading-none">
-                {isFavorite(promo.id) ? '❤️' : '🤍'}
-              </span>
-            </button>
-          </div>
-          <p className="text-theme-muted mb-6">{promo.merchants?.name || 'Marchand'}</p>
-
-          <p className="text-slate-700 dark:text-gray-300 leading-relaxed mb-8">{promo.description}</p>
-
-          {promo.promo_code && (
-            <div className="mb-8">
-              {codeRevealed ? (
-                <div className="bg-dark-surface border-2 border-neon-purple rounded-xl p-6 text-center">
-                  <p className="text-sm text-theme-muted mb-2">Ton code promo</p>
-                  <p className="text-3xl font-mono font-bold text-neon-cyan tracking-widest">
-                    {promo.promo_code}
-                  </p>
-                  {claimed && (
-                    <p className="text-xs text-green-400 mt-2">Offre enregistrée !</p>
-                  )}
-                </div>
-              ) : (
-                <button
-                  onClick={handleClaim}
-                  className="w-full bg-gradient-to-r from-neon-purple to-neon-cyan text-white font-bold py-4 rounded-xl text-lg hover:opacity-90 transition-opacity cursor-pointer"
-                >
-                  Révéler le code promo
-                </button>
+              {promo.is_exclusive && (
+                <span className="rounded-full bg-insolit-pink px-3 py-1 text-sm font-bold text-white">
+                  Exclusif
+                </span>
               )}
             </div>
-          )}
 
-          {promo.end_date && (
-            <p className="text-sm text-theme-subtle mb-6">
-              Valable jusqu'au {new Date(promo.end_date).toLocaleDateString('fr-FR')}
-            </p>
-          )}
-
-          {hasCoords && (
-            <div className="rounded-xl overflow-hidden border border-dark-border">
-              <MapContainer
-                center={[promo.latitude, promo.longitude]}
-                zoom={15}
-                scrollWheelZoom={false}
+            <div className="mb-2 flex items-start justify-between gap-4">
+              <h1 className="text-3xl font-bold text-theme">{promo.title}</h1>
+              <button
+                type="button"
+                onClick={() => toggleFavorite(promo.id)}
+                aria-label={favorited ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-dark-border bg-dark-surface transition-colors hover:border-insolit-pink/50"
               >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                <Heart
+                  className="h-5 w-5 text-insolit-pink"
+                  strokeWidth={2}
+                  fill={favorited ? 'currentColor' : 'none'}
+                  aria-hidden
                 />
-                <Marker position={[promo.latitude, promo.longitude]}>
-                  <Popup>{promo.merchants?.name || promo.title}</Popup>
-                </Marker>
-              </MapContainer>
+              </button>
             </div>
-          )}
+            <p className="mb-6 text-theme-muted">{promo.merchants?.name || 'Marchand'}</p>
+
+            <p className="mb-8 leading-relaxed text-slate-700 dark:text-gray-300">{promo.description}</p>
+
+            {promo.promo_code && (
+              <div className="mb-8">
+                {codeRevealed ? (
+                  <div className="rounded-xl border-2 border-insolit-pink/50 bg-insolit-pink/5 p-6 text-center dark:bg-insolit-pink/10">
+                    <p className="mb-2 text-sm text-theme-muted">Ton code promo</p>
+                    <p className="font-mono text-3xl font-bold tracking-widest text-insolit-pink">
+                      {promo.promo_code}
+                    </p>
+                    {claimed && <p className="mt-2 text-xs text-emerald-600 dark:text-emerald-400">Offre enregistrée !</p>}
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleClaim}
+                    className="w-full cursor-pointer rounded-xl bg-insolit-pink py-4 text-lg font-bold text-white transition-opacity hover:bg-insolit-pink-hover hover:opacity-95"
+                  >
+                    Révéler le code promo
+                  </button>
+                )}
+              </div>
+            )}
+
+            {promo.end_date && (
+              <p className="mb-6 text-sm text-theme-subtle">
+                Valable jusqu'au {new Date(promo.end_date).toLocaleDateString('fr-FR')}
+              </p>
+            )}
+
+            {hasCoords && (
+              <div className="h-64 overflow-hidden rounded-xl border border-dark-border">
+                <MapContainer
+                  center={[promo.latitude, promo.longitude]}
+                  zoom={15}
+                  scrollWheelZoom={false}
+                  className="z-0 h-full w-full"
+                  style={{ height: '100%', width: '100%' }}
+                >
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  <Marker position={[promo.latitude, promo.longitude]}>
+                    <Popup>{promo.merchants?.name || promo.title}</Popup>
+                  </Marker>
+                </MapContainer>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
