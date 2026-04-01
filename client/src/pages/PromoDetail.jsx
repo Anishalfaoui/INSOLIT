@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import { useAuth } from '../context/AuthContext'
+import { useFavorites } from '../context/FavoritesContext'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 
@@ -16,6 +17,7 @@ L.Icon.Default.mergeOptions({
 export default function PromoDetail() {
   const { id } = useParams()
   const { user, getToken } = useAuth()
+  const { isFavorite, toggleFavorite } = useFavorites()
   const [promo, setPromo] = useState(null)
   const [loading, setLoading] = useState(true)
   const [codeRevealed, setCodeRevealed] = useState(false)
@@ -90,7 +92,18 @@ export default function PromoDetail() {
             )}
           </div>
 
-          <h1 className="text-3xl font-bold text-white mb-2">{promo.title}</h1>
+          <div className="flex items-start justify-between gap-4 mb-2">
+            <h1 className="text-3xl font-bold text-white">{promo.title}</h1>
+            <button
+              onClick={() => toggleFavorite(promo.id)}
+              aria-label={isFavorite(promo.id) ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+              className="shrink-0 w-11 h-11 flex items-center justify-center rounded-full bg-dark-surface border border-dark-border hover:border-neon-purple/50 transition-colors cursor-pointer"
+            >
+              <span className="text-xl leading-none">
+                {isFavorite(promo.id) ? '❤️' : '🤍'}
+              </span>
+            </button>
+          </div>
           <p className="text-gray-400 mb-6">{promo.merchants?.name || 'Marchand'}</p>
 
           <p className="text-gray-300 leading-relaxed mb-8">{promo.description}</p>

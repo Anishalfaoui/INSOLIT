@@ -26,6 +26,9 @@ export default function Navbar() {
                 <NavLink to="/" className={navLinkClass} end>
                   Bons Plans
                 </NavLink>
+                <NavLink to="/favorites" className={navLinkClass}>
+                  Favoris
+                </NavLink>
                 <NavLink to="/map" className={navLinkClass}>
                   Carte
                 </NavLink>
@@ -53,7 +56,7 @@ export default function Navbar() {
 
       {user ? (
         <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-dark-border bg-dark-card/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)]">
-          <div className="grid grid-cols-3 px-1 py-1">
+          <div className="grid grid-cols-4 px-1 py-1">
             <NavLink
               to="/"
               end
@@ -63,6 +66,16 @@ export default function Navbar() {
             >
               <span className="text-base">🎟️</span>
               <span>Offres</span>
+            </NavLink>
+
+            <NavLink
+              to="/favorites"
+              className={({ isActive }) =>
+                `flex flex-col items-center rounded-lg py-2 text-xs transition-colors ${isActive ? 'text-neon-cyan bg-dark-surface' : 'text-gray-400'}`
+              }
+            >
+              <span className="text-base">❤️</span>
+              <span>Favoris</span>
             </NavLink>
 
             <NavLink

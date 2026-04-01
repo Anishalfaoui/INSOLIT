@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
+import { FavoritesProvider } from './context/FavoritesContext'
 import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
@@ -8,6 +9,7 @@ import Dashboard from './pages/Dashboard'
 import PromoDetail from './pages/PromoDetail'
 import MapView from './pages/MapView'
 import Account from './pages/Account'
+import Favorites from './pages/Favorites'
 
 function AppRoutes() {
   return (
@@ -48,6 +50,14 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/favorites"
+          element={
+            <ProtectedRoute>
+              <Favorites />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </div>
   )
@@ -57,7 +67,9 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <FavoritesProvider>
+          <AppRoutes />
+        </FavoritesProvider>
       </AuthProvider>
     </BrowserRouter>
   )

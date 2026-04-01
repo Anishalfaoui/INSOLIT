@@ -5,6 +5,7 @@ import promosRouter from './routes/promos.js'
 import claimRouter from './routes/claim.js'
 import categoriesRouter from './routes/categories.js'
 import authRouter from './routes/auth.js'
+import favoritesRouter from './routes/favorites.js'
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -16,6 +17,7 @@ app.use('/api/promos', promosRouter)
 app.use('/api/claim', claimRouter)
 app.use('/api/categories', categoriesRouter)
 app.use('/api/auth', authRouter)
+app.use('/api/favorites', favoritesRouter)
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' })

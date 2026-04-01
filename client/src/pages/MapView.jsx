@@ -4,6 +4,7 @@ import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet'
 import { Popup } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { useFavorites } from '../context/FavoritesContext'
 
 const PARIS_CENTER = [48.8566, 2.3522]
 const NEAR_ME_RADIUS_KM = 3
@@ -58,9 +59,11 @@ export default function MapView() {
   const [activeFilter, setActiveFilter] = useState('all')
   const [promos, setPromos] = useState([])
   const [isNearMeActive, setIsNearMeActive] = useState(false)
+  const [isFavoritesOnly, setIsFavoritesOnly] = useState(false)
   const [isLocating, setIsLocating] = useState(false)
   const [geoError, setGeoError] = useState('')
   const [userLocation, setUserLocation] = useState(null)
+  const { isFavorite } = useFavorites()
 
   useEffect(() => {
     fetch('/api/promos')
@@ -137,6 +140,7 @@ export default function MapView() {
     return allMarkers.filter((marker) => {
       const filterMatch = activeFilter === 'all' ? true : marker.category === activeFilter
       const queryMatch = !q || marker.name.toLowerCase().includes(q)
+      const favoriteMatch = isFavoritesOnly ? isFavorite(marker.promoId) : true
 
       let nearMatch = true
       if (isNearMeActive && userLocation) {
@@ -147,9 +151,9 @@ export default function MapView() {
           ) <= NEAR_ME_RADIUS_KM
       }
 
-      return filterMatch && queryMatch && nearMatch
+      return filterMatch && queryMatch && nearMatch && favoriteMatch
     })
-  }, [allMarkers, activeFilter, query, isNearMeActive, userLocation])
+  }, [allMarkers, activeFilter, query, isNearMeActive, userLocation, isFavoritesOnly, isFavorite])
 
   const mapCenter = useMemo(() => {
     if (isNearMeActive && userLocation) {
@@ -175,7 +179,7 @@ export default function MapView() {
           className="w-full rounded-2xl bg-[#191b26] border border-[#2a2d3d] px-4 py-3 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-[#ff2e9c]"
         />
 
-        <div className="mt-3 flex items-center gap-2">
+        <div className="mt-3 flex items-center gap-2 flex-wrap">
           <button
             onClick={handleNearMeClick}
             disabled={isLocating}
@@ -185,7 +189,19 @@ export default function MapView() {
                 : 'bg-[#1a1d2a] border-[#2f3346] text-gray-300'
             }`}
           >
-            {isLocating ? 'Localisation...' : isNearMeActive ? 'Near me now ON' : '📍 Near me now'}
+            {isLocating ? 'Localisation...' : isNearMeActive ? '📍 Near me now ON' : '📍 Near me now'}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsFavoritesOnly((prev) => !prev)}
+            className={`rounded-full px-4 py-2 text-sm font-semibold border transition-colors cursor-pointer ${
+              isFavoritesOnly
+                ? 'bg-[#ff2e9c] border-[#ff2e9c] text-white'
+                : 'bg-[#1a1d2a] border-[#2f3346] text-gray-300'
+            }`}
+          >
+            {isFavoritesOnly ? '❤️ Favoris ON' : '🤍 Favoris'}
           </button>
 
           {isNearMeActive && (
@@ -264,7 +280,10 @@ export default function MapView() {
           </MapContainer>
         </div>
         {isNearMeActive && visibleMarkers.length === 0 && (
-          <p className="mt-2 text-xs text-gray-400">Aucune offre trouvee dans un rayon de {NEAR_ME_RADIUS_KM} km.</p>
+          <p className="mt-2 text-xs text-gray-400">Aucune offre trouvée dans un rayon de {NEAR_ME_RADIUS_KM} km.</p>
+        )}
+        {isFavoritesOnly && visibleMarkers.length === 0 && (
+          <p className="mt-2 text-xs text-gray-400">Aucun favori avec une position sur la carte.</p>
         )}
       </main>
     </div>
