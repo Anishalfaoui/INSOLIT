@@ -35,7 +35,7 @@ export default function Favorites() {
             Mes Favoris
           </span>
         </h1>
-        <p className="text-sm sm:text-base text-gray-400">
+        <p className="text-sm sm:text-base text-theme-muted">
           Tes bons plans sauvegardés
         </p>
       </div>
@@ -45,7 +45,7 @@ export default function Favorites() {
           <div className="w-8 h-8 border-2 border-neon-purple border-t-transparent rounded-full animate-spin" />
         </div>
       ) : favorites.length === 0 ? (
-        <div className="text-center py-20 text-gray-400">
+        <div className="text-center py-20 text-theme-muted">
           <p className="text-5xl mb-4">🤍</p>
           <p className="text-lg">Aucun favori pour le moment</p>
           <p className="text-sm mt-2">Clique sur le cœur d'une offre pour la sauvegarder</p>

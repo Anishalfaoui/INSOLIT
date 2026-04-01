@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { PartnerAuthProvider } from './context/PartnerAuthContext'
+import { ThemeProvider } from './context/ThemeContext'
 import { FavoritesProvider } from './context/FavoritesContext'
 import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -110,13 +111,15 @@ function AppRoutes() {
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <PartnerAuthProvider>
-          <FavoritesProvider>
-            <AppRoutes />
-          </FavoritesProvider>
-        </PartnerAuthProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <PartnerAuthProvider>
+            <FavoritesProvider>
+              <AppRoutes />
+            </FavoritesProvider>
+          </PartnerAuthProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   )
 }

@@ -168,7 +168,7 @@ export default function MapView() {
   }, [isNearMeActive, userLocation, visibleMarkers])
 
   return (
-    <div className="h-[calc(100dvh-5rem)] md:h-[calc(100dvh-4rem)] w-full bg-[#0d0e14] text-white flex flex-col overflow-hidden">
+    <div className="h-[calc(100dvh-5rem)] md:h-[calc(100dvh-4rem)] w-full bg-slate-100 text-slate-900 flex flex-col overflow-hidden dark:bg-[#0d0e14] dark:text-white">
       <header className="px-4 pt-4 pb-3 shrink-0 md:max-w-7xl md:mx-auto md:w-full md:px-6 lg:px-8">
 
         <input
@@ -176,7 +176,7 @@ export default function MapView() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Ex : Burger, soirée..."
-          className="w-full rounded-2xl bg-[#191b26] border border-[#2a2d3d] px-4 py-3 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-[#ff2e9c]"
+          className="w-full rounded-2xl border px-4 py-3 text-sm focus:outline-none focus:border-[#ff2e9c] bg-white border-slate-200 text-slate-900 placeholder-slate-400 dark:bg-[#191b26] dark:border-[#2a2d3d] dark:text-gray-100 dark:placeholder-gray-500"
         />
 
         <div className="mt-3 flex items-center gap-2 flex-wrap">
@@ -186,7 +186,7 @@ export default function MapView() {
             className={`rounded-full px-4 py-2 text-sm font-semibold border transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed ${
               isNearMeActive
                 ? 'bg-[#ff2e9c] border-[#ff2e9c] text-white'
-                : 'bg-[#1a1d2a] border-[#2f3346] text-gray-300'
+                : 'bg-white border-slate-200 text-slate-700 dark:bg-[#1a1d2a] dark:border-[#2f3346] dark:text-gray-300'
             }`}
           >
             {isLocating ? 'Localisation...' : isNearMeActive ? '📍 Near me now ON' : '📍 Near me now'}
@@ -205,7 +205,7 @@ export default function MapView() {
           </button>
 
           {isNearMeActive && (
-            <span className="text-xs text-gray-400">Rayon: {NEAR_ME_RADIUS_KM} km</span>
+            <span className="text-xs text-slate-500 dark:text-gray-400">Rayon: {NEAR_ME_RADIUS_KM} km</span>
           )}
         </div>
 
@@ -232,7 +232,7 @@ export default function MapView() {
       </header>
 
       <main className="relative flex-1 min-h-0 px-4 pb-4 md:px-6 lg:px-8">
-        <div className="h-full overflow-hidden rounded-2xl border border-[#2a2d3d] shadow-[0_12px_30px_rgba(0,0,0,0.35)]">
+        <div className="h-full overflow-hidden rounded-2xl border border-slate-200 shadow-lg dark:border-[#2a2d3d] dark:shadow-[0_12px_30px_rgba(0,0,0,0.35)]">
           <MapContainer
             center={mapCenter}
             zoom={11}
@@ -280,10 +280,10 @@ export default function MapView() {
           </MapContainer>
         </div>
         {isNearMeActive && visibleMarkers.length === 0 && (
-          <p className="mt-2 text-xs text-gray-400">Aucune offre trouvée dans un rayon de {NEAR_ME_RADIUS_KM} km.</p>
+          <p className="mt-2 text-xs text-theme-muted">Aucune offre trouvée dans un rayon de {NEAR_ME_RADIUS_KM} km.</p>
         )}
         {isFavoritesOnly && visibleMarkers.length === 0 && (
-          <p className="mt-2 text-xs text-gray-400">Aucun favori avec une position sur la carte.</p>
+          <p className="mt-2 text-xs text-theme-muted">Aucun favori avec une position sur la carte.</p>
         )}
       </main>
     </div>

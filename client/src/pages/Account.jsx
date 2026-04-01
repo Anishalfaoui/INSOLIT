@@ -77,7 +77,7 @@ export default function Account() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold mb-6">Mon compte</h1>
+      <h1 className="text-3xl font-bold mb-6 text-theme">Mon compte</h1>
 
       <div className="bg-dark-card border border-dark-border rounded-2xl p-6 sm:p-8">
         {error && (
@@ -101,14 +101,14 @@ export default function Account() {
               )}
             </div>
             <div className="flex-1">
-              <label className="block text-sm text-gray-400 mb-2">Photo de profil</label>
+              <label className="block text-sm text-theme-muted mb-2">Photo de profil</label>
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
-                className="block w-full text-sm text-gray-300 file:mr-3 file:px-4 file:py-2 file:rounded-lg file:border-0 file:bg-dark-surface file:text-gray-200"
+                className="block w-full text-sm text-slate-600 file:mr-3 file:px-4 file:py-2 file:rounded-lg file:border-0 file:bg-dark-surface file:text-slate-800 dark:text-gray-300 dark:file:text-gray-200"
               />
-              <p className="text-xs text-gray-500 mt-2">PNG/JPG/WEBP - max 2MB</p>
+              <p className="text-xs text-theme-subtle mt-2">PNG/JPG/WEBP - max 2MB</p>
             </div>
           </div>
 
@@ -125,36 +125,36 @@ export default function Account() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Date de naissance</label>
+              <label className="block text-sm text-theme-muted mb-1">Date de naissance</label>
               <input
                 type="date"
                 value={birthDate}
                 onChange={(e) => setBirthDate(e.target.value)}
                 required
-                className="w-full bg-dark-surface border border-dark-border rounded-lg px-4 py-3 text-white focus:outline-none focus:border-neon-purple"
+                className="input-theme"
               />
             </div>
 
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Téléphone</label>
+              <label className="block text-sm text-theme-muted mb-1">Téléphone</label>
               <input
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 required
-                className="w-full bg-dark-surface border border-dark-border rounded-lg px-4 py-3 text-white focus:outline-none focus:border-neon-purple"
+                className="input-theme"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Ville</label>
+            <label className="block text-sm text-theme-muted mb-1">Ville</label>
             <input
               type="text"
               value={city}
               onChange={(e) => setCity(e.target.value)}
               required
-              className="w-full bg-dark-surface border border-dark-border rounded-lg px-4 py-3 text-white focus:outline-none focus:border-neon-purple"
+              className="input-theme"
             />
           </div>
 
@@ -170,7 +170,7 @@ export default function Account() {
             <button
               type="button"
               onClick={signOut}
-              className="w-full sm:w-auto px-6 py-3 rounded-lg font-medium border border-dark-border bg-dark-surface text-gray-200 hover:border-neon-purple/50 transition-colors cursor-pointer"
+              className="w-full sm:w-auto px-6 py-3 rounded-lg font-medium border border-dark-border bg-dark-surface text-slate-700 hover:border-neon-purple/50 transition-colors cursor-pointer dark:text-gray-200"
             >
               Déconnexion
             </button>
