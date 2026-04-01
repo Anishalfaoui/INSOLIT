@@ -9,6 +9,11 @@ import { useFavorites } from '../context/FavoritesContext'
 const PARIS_CENTER = [48.8566, 2.3522]
 const NEAR_ME_RADIUS_KM = 3
 
+const chipActive =
+  'rounded-full border border-transparent bg-gradient-to-r from-neon-purple to-neon-cyan px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-neon-purple/20 transition-colors cursor-pointer'
+const chipInactive =
+  'rounded-full border border-dark-border bg-dark-card px-4 py-2 text-sm font-semibold text-slate-600 transition-colors cursor-pointer hover:border-neon-purple/50 hover:text-slate-900 dark:bg-dark-surface dark:text-gray-400 dark:hover:text-white'
+
 function haversineDistanceKm(from, to) {
   const toRad = (deg) => (deg * Math.PI) / 180
   const earthRadiusKm = 6371
@@ -107,7 +112,7 @@ export default function MapView() {
     }
 
     if (!navigator.geolocation) {
-      setGeoError('La geolocalisation est indisponible sur cet appareil.')
+      setGeoError('La géolocalisation est indisponible sur cet appareil.')
       return
     }
 
@@ -124,7 +129,7 @@ export default function MapView() {
         setIsLocating(false)
       },
       () => {
-        setGeoError('Autorise la geolocalisation pour utiliser Near me now.')
+        setGeoError('Autorise la géolocalisation pour utiliser « Près de moi ».')
         setIsLocating(false)
       },
       {
@@ -168,48 +173,58 @@ export default function MapView() {
   }, [isNearMeActive, userLocation, visibleMarkers])
 
   return (
-    <div className="h-[calc(100dvh-5rem)] md:h-[calc(100dvh-4rem)] w-full bg-slate-100 text-slate-900 flex flex-col overflow-hidden dark:bg-[#0d0e14] dark:text-white">
-      <header className="px-4 pt-4 pb-3 shrink-0 md:max-w-7xl md:mx-auto md:w-full md:px-6 lg:px-8">
+    <div className="flex h-[calc(100dvh-5rem)] w-full flex-col overflow-hidden bg-dark-bg text-theme md:h-[calc(100dvh-4rem)]">
+      <header className="max-w-7xl mx-auto w-full shrink-0 px-4 pt-4 pb-3 sm:px-6 lg:px-8">
+        <div className="mb-4 sm:mb-5">
+          <h1 className="text-2xl sm:text-3xl font-bold leading-tight mb-1">
+            <span className="bg-linear-to-r from-neon-purple to-neon-cyan bg-clip-text text-transparent">
+              Carte
+            </span>{' '}
+            des offres
+          </h1>
+          <p className="text-sm sm:text-base text-theme-muted">
+            Repère les bons plans autour de toi
+          </p>
+        </div>
 
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Ex : Burger, soirée..."
-          className="w-full rounded-2xl border px-4 py-3 text-sm focus:outline-none focus:border-[#ff2e9c] bg-white border-slate-200 text-slate-900 placeholder-slate-400 dark:bg-[#191b26] dark:border-[#2a2d3d] dark:text-gray-100 dark:placeholder-gray-500"
+          placeholder="Ex. : burger, soirée, sport…"
+          className="input-theme rounded-2xl"
         />
 
-        <div className="mt-3 flex items-center gap-2 flex-wrap">
+        <div className="mt-3 flex flex-wrap items-center gap-2">
           <button
+            type="button"
             onClick={handleNearMeClick}
             disabled={isLocating}
-            className={`rounded-full px-4 py-2 text-sm font-semibold border transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed ${
-              isNearMeActive
-                ? 'bg-[#ff2e9c] border-[#ff2e9c] text-white'
-                : 'bg-white border-slate-200 text-slate-700 dark:bg-[#1a1d2a] dark:border-[#2f3346] dark:text-gray-300'
-            }`}
+            className={`${isNearMeActive ? chipActive : chipInactive} disabled:cursor-not-allowed disabled:opacity-60`}
           >
-            {isLocating ? 'Localisation...' : isNearMeActive ? '📍 Near me now ON' : '📍 Near me now'}
+            {isLocating
+              ? 'Localisation…'
+              : isNearMeActive
+                ? '📍 Près de moi (actif)'
+                : '📍 Près de moi'}
           </button>
 
           <button
             type="button"
             onClick={() => setIsFavoritesOnly((prev) => !prev)}
-            className={`rounded-full px-4 py-2 text-sm font-semibold border transition-colors cursor-pointer ${
-              isFavoritesOnly
-                ? 'bg-[#ff2e9c] border-[#ff2e9c] text-white'
-                : 'bg-[#1a1d2a] border-[#2f3346] text-gray-300'
-            }`}
+            className={isFavoritesOnly ? chipActive : chipInactive}
           >
-            {isFavoritesOnly ? '❤️ Favoris ON' : '🤍 Favoris'}
+            {isFavoritesOnly ? '❤️ Favoris uniquement' : '🤍 Favoris'}
           </button>
 
           {isNearMeActive && (
-            <span className="text-xs text-slate-500 dark:text-gray-400">Rayon: {NEAR_ME_RADIUS_KM} km</span>
+            <span className="text-xs text-theme-muted">Rayon : {NEAR_ME_RADIUS_KM} km</span>
           )}
         </div>
 
-        {geoError && <p className="mt-2 text-xs text-red-400">{geoError}</p>}
+        {geoError && (
+          <p className="mt-2 text-xs text-red-400 dark:text-red-400">{geoError}</p>
+        )}
 
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
           {filters.map((filter) => {
@@ -217,12 +232,9 @@ export default function MapView() {
             return (
               <button
                 key={filter.key}
+                type="button"
                 onClick={() => setActiveFilter(filter.key)}
-                className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold border transition-colors cursor-pointer ${
-                  active
-                    ? 'bg-[#ff2e9c] border-[#ff2e9c] text-white'
-                    : 'bg-[#1a1d2a] border-[#2f3346] text-gray-300'
-                }`}
+                className={active ? chipActive : chipInactive}
               >
                 {filter.label}
               </button>
@@ -231,59 +243,66 @@ export default function MapView() {
         </div>
       </header>
 
-      <main className="relative flex-1 min-h-0 px-4 pb-4 md:px-6 lg:px-8">
-        <div className="h-full overflow-hidden rounded-2xl border border-slate-200 shadow-lg dark:border-[#2a2d3d] dark:shadow-[0_12px_30px_rgba(0,0,0,0.35)]">
-          <MapContainer
-            center={mapCenter}
-            zoom={11}
-            scrollWheelZoom
-            style={{ height: '100%', width: '100%' }}
-          >
-            <MapAutoCenter center={mapCenter} zoom={isNearMeActive && userLocation ? 13 : 11} />
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {isNearMeActive && userLocation && (
-              <Marker position={[userLocation.lat, userLocation.lng]} icon={getPinIcon('📍')}>
-                <Popup>
-                  <p className="font-semibold text-[#111827]">Vous etes ici</p>
-                </Popup>
-              </Marker>
-            )}
-            {visibleMarkers.map((marker) => (
-              <Marker
-                key={marker.id}
-                position={[marker.lat, marker.lng]}
-                icon={getPinIcon(marker.emoji)}
-              >
-                <Popup>
-                  <div className="min-w-45">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-lg">{marker.emoji}</span>
-                      <p className="font-semibold text-sm text-[#111827]">{marker.category}</p>
+      <main className="relative flex min-h-0 flex-1 px-4 pb-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto flex h-full w-full min-h-0">
+          <div className="h-full w-full min-h-0 overflow-hidden rounded-2xl border border-dark-border bg-dark-card shadow-lg shadow-neon-purple/5 dark:shadow-neon-purple/10">
+            <MapContainer
+              center={mapCenter}
+              zoom={11}
+              scrollWheelZoom
+              className="map-view-leaflet z-0"
+              style={{ height: '100%', width: '100%' }}
+            >
+              <MapAutoCenter center={mapCenter} zoom={isNearMeActive && userLocation ? 13 : 11} />
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              {isNearMeActive && userLocation && (
+                <Marker position={[userLocation.lat, userLocation.lng]} icon={getPinIcon('📍')}>
+                  <Popup>
+                    <p className="font-semibold text-slate-900">Tu es ici</p>
+                  </Popup>
+                </Marker>
+              )}
+              {visibleMarkers.map((marker) => (
+                <Marker
+                  key={marker.id}
+                  position={[marker.lat, marker.lng]}
+                  icon={getPinIcon(marker.emoji)}
+                >
+                  <Popup>
+                    <div className="min-w-[11rem] text-slate-900">
+                      <div className="mb-2 flex items-center gap-2">
+                        <span className="text-lg">{marker.emoji}</span>
+                        <p className="text-sm font-semibold text-neon-cyan">{marker.category}</p>
+                      </div>
+                      <p className="mb-1 font-semibold">{marker.name}</p>
+                      <p className="mb-3 text-xs text-slate-600">{marker.merchant}</p>
+                      {marker.promoId && (
+                        <Link
+                          to={`/promo/${marker.promoId}`}
+                          className="inline-flex items-center rounded-lg bg-linear-to-r from-neon-purple to-neon-cyan px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
+                        >
+                          Voir la promo
+                        </Link>
+                      )}
                     </div>
-                    <p className="font-semibold text-[#111827] mb-1">{marker.name}</p>
-                    <p className="text-xs text-gray-600 mb-3">{marker.merchant}</p>
-                    {marker.promoId && (
-                      <Link
-                        to={`/promo/${marker.promoId}`}
-                        className="inline-flex items-center rounded-md bg-[#ff2e9c] px-3 py-1.5 text-xs font-semibold text-white"
-                      >
-                        Voir la promo
-                      </Link>
-                    )}
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
+                  </Popup>
+                </Marker>
+              ))}
+            </MapContainer>
+          </div>
         </div>
         {isNearMeActive && visibleMarkers.length === 0 && (
-          <p className="mt-2 text-xs text-theme-muted">Aucune offre trouvée dans un rayon de {NEAR_ME_RADIUS_KM} km.</p>
+          <p className="absolute bottom-6 left-1/2 z-[400] max-w-md -translate-x-1/2 rounded-lg border border-dark-border bg-dark-card px-4 py-2 text-center text-xs text-theme-muted shadow-lg">
+            Aucune offre dans un rayon de {NEAR_ME_RADIUS_KM} km.
+          </p>
         )}
         {isFavoritesOnly && visibleMarkers.length === 0 && (
-          <p className="mt-2 text-xs text-theme-muted">Aucun favori avec une position sur la carte.</p>
+          <p className="absolute bottom-6 left-1/2 z-[400] max-w-md -translate-x-1/2 rounded-lg border border-dark-border bg-dark-card px-4 py-2 text-center text-xs text-theme-muted shadow-lg">
+            Aucun favori avec une position sur la carte.
+          </p>
         )}
       </main>
     </div>
