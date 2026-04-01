@@ -4,6 +4,7 @@ import { PartnerAuthProvider } from './context/PartnerAuthContext'
 import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
 import ProtectedPartnerRoute from './components/ProtectedPartnerRoute'
+import { useAuth } from './context/AuthContext'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
@@ -13,6 +14,14 @@ import Account from './pages/Account'
 import PartnerLogin from './pages/partner/PartnerLogin'
 import PartnerRegister from './pages/partner/PartnerRegister'
 import PartnerDashboard from './pages/partner/PartnerDashboard'
+import AdminDashboard from './pages/AdminDashboard'
+
+function MemberOnlyRoute({ children }) {
+  const { user, loading } = useAuth()
+  if (loading) return null
+  if (user?.is_admin) return <Navigate to="/admin" replace />
+  return children
+}
 
 function AppRoutes() {
   return (
@@ -37,7 +46,9 @@ function AppRoutes() {
           path="/"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <MemberOnlyRoute>
+                <Dashboard />
+              </MemberOnlyRoute>
             </ProtectedRoute>
           }
         />
@@ -45,7 +56,9 @@ function AppRoutes() {
           path="/promo/:id"
           element={
             <ProtectedRoute>
-              <PromoDetail />
+              <MemberOnlyRoute>
+                <PromoDetail />
+              </MemberOnlyRoute>
             </ProtectedRoute>
           }
         />
@@ -53,7 +66,9 @@ function AppRoutes() {
           path="/map"
           element={
             <ProtectedRoute>
-              <MapView />
+              <MemberOnlyRoute>
+                <MapView />
+              </MemberOnlyRoute>
             </ProtectedRoute>
           }
         />
@@ -61,7 +76,17 @@ function AppRoutes() {
           path="/account"
           element={
             <ProtectedRoute>
-              <Account />
+              <MemberOnlyRoute>
+                <Account />
+              </MemberOnlyRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
             </ProtectedRoute>
           }
         />

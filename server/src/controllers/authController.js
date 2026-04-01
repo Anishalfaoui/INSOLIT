@@ -7,6 +7,7 @@ function sanitizeUser(user) {
   return {
     id: user.id,
     email: user.email,
+    is_admin: Boolean(user.is_admin),
     avatar_url: user.avatar_url,
     full_name: user.full_name,
     birth_date: user.birth_date,
@@ -89,7 +90,7 @@ export async function register(req, res) {
       phone,
       city,
     })
-    .select('id, email, avatar_url, full_name, birth_date, phone, city')
+    .select('id, email, is_admin, avatar_url, full_name, birth_date, phone, city')
     .single()
 
   if (error) {
@@ -298,7 +299,7 @@ export async function login(req, res) {
 
   const { data: user, error } = await supabase
     .from('users')
-    .select('id, email, avatar_url, password_hash, full_name, birth_date, phone, city')
+    .select('id, email, is_admin, avatar_url, password_hash, full_name, birth_date, phone, city')
     .eq('email', normalizedEmail)
     .maybeSingle()
 
@@ -322,7 +323,7 @@ export async function login(req, res) {
 export async function me(req, res) {
   const { data: user, error } = await supabase
     .from('users')
-    .select('id, email, avatar_url, full_name, birth_date, phone, city')
+    .select('id, email, is_admin, avatar_url, full_name, birth_date, phone, city')
     .eq('id', req.user.id)
     .maybeSingle()
 
@@ -364,7 +365,7 @@ export async function updateMe(req, res) {
     .from('users')
     .update(payload)
     .eq('id', req.user.id)
-    .select('id, email, avatar_url, full_name, birth_date, phone, city')
+    .select('id, email, is_admin, avatar_url, full_name, birth_date, phone, city')
     .single()
 
   if (error) {
