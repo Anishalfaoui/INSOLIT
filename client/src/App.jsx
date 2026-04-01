@@ -23,7 +23,7 @@ function MemberOnlyRoute({ children }) {
 
 function AppRoutes() {
   return (
-    <div className="min-h-screen bg-dark-bg pb-20 md:pb-0">
+    <div className="page-shell min-h-screen pb-20 md:pb-0">
       <Navbar />
       <Routes>
         <Route path="/login" element={<Login />} />

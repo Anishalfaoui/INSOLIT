@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { FolderOpen } from 'lucide-react'
 import PromoCard from '../components/PromoCard'
 import CategoryFilter from '../components/CategoryFilter'
 
@@ -34,37 +35,42 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8">
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-4xl font-bold mb-2 leading-tight">
-          <span className="bg-linear-to-r from-neon-purple to-neon-cyan bg-clip-text text-transparent">
-            Bons Plans
-          </span>{' '}
-          du moment
-        </h1>
-        <p className="text-sm sm:text-base text-theme-muted">Les meilleurs deals exclusifs pour les moins de 26 ans</p>
-      </div>
+    <div className="page-shell min-h-[calc(100dvh-5rem)] md:min-h-[calc(100dvh-4rem)]">
+      <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="mb-2 text-2xl font-bold leading-tight sm:text-4xl">
+            <span className="text-insolit-pink">Bons Plans</span>{' '}
+            <span className="text-theme">du moment</span>
+          </h1>
+          <p className="text-sm text-theme-muted sm:text-base">
+            Les meilleurs deals exclusifs pour les moins de 26 ans
+          </p>
+        </div>
 
-      <div className="mb-6 sm:mb-8">
-        <CategoryFilter selected={category} onChange={setCategory} categories={categories} />
-      </div>
+        <div className="mb-6 sm:mb-8">
+          <CategoryFilter selected={category} onChange={setCategory} categories={categories} />
+        </div>
 
-      {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="w-8 h-8 border-2 border-neon-purple border-t-transparent rounded-full animate-spin" />
-        </div>
-      ) : promos.length === 0 ? (
-        <div className="text-center py-20 text-theme-muted">
-          <p className="text-5xl mb-4">😢</p>
-          <p className="text-lg">Aucune promo trouvée dans cette catégorie</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {promos.map((promo) => (
-            <PromoCard key={promo.id} promo={promo} />
-          ))}
-        </div>
-      )}
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-insolit-pink border-t-transparent" />
+          </div>
+        ) : promos.length === 0 ? (
+          <div className="flex flex-col items-center py-20 text-center text-theme-muted">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-insolit-pink/10 text-insolit-pink">
+              <FolderOpen className="h-8 w-8" strokeWidth={1.75} aria-hidden />
+            </div>
+            <p className="text-lg font-medium text-theme">Aucune promo dans cette catégorie</p>
+            <p className="mt-1 text-sm">Essaie une autre catégorie ou reviens plus tard.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {promos.map((promo) => (
+              <PromoCard key={promo.id} promo={promo} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

@@ -4,15 +4,18 @@ import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet'
 import { Popup } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { Heart, LayoutGrid, Loader2, MapPin, Navigation, Search } from 'lucide-react'
 import { useFavorites } from '../context/FavoritesContext'
+import CategoryGlyph from '../components/CategoryGlyph'
+import { categoryToPinIconKey, renderPinInnerHtml } from '../lib/mapPinIcon'
 
 const PARIS_CENTER = [48.8566, 2.3522]
 const NEAR_ME_RADIUS_KM = 3
 
-const chipActive =
-  'rounded-full border border-transparent bg-gradient-to-r from-neon-purple to-neon-cyan px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-neon-purple/20 transition-colors cursor-pointer'
-const chipInactive =
-  'rounded-full border border-dark-border bg-dark-card px-4 py-2 text-sm font-semibold text-slate-600 transition-colors cursor-pointer hover:border-neon-purple/50 hover:text-slate-900 dark:bg-dark-surface dark:text-gray-400 dark:hover:text-white'
+const chipBase =
+  'inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition-colors cursor-pointer'
+const chipActive = `${chipBase} border-transparent bg-insolit-pink text-white shadow-md shadow-pink-500/30 hover:bg-insolit-pink-hover`
+const chipInactive = `${chipBase} border-slate-200/90 bg-white text-slate-700 shadow-sm hover:border-insolit-pink/40 dark:border-dark-border dark:bg-dark-surface dark:text-gray-300 dark:shadow-none dark:hover:border-insolit-pink/50`
 
 function haversineDistanceKm(from, to) {
   const toRad = (deg) => (deg * Math.PI) / 180
@@ -43,19 +46,24 @@ function MapAutoCenter({ center, zoom }) {
 }
 
 const iconCache = new Map()
-function getPinIcon(emoji) {
-  if (iconCache.has(emoji)) {
-    return iconCache.get(emoji)
+function getPinLeafletIcon(iconKey, variant = 'promo') {
+  const cacheKey = `${variant}:${iconKey}`
+  if (iconCache.has(cacheKey)) {
+    return iconCache.get(cacheKey)
   }
+
+  const innerKey = variant === 'user' ? 'user' : iconKey
+  const inner = renderPinInnerHtml(innerKey, variant === 'user' ? 'user' : 'promo')
+  const pinClass = variant === 'user' ? 'insolit-pin insolit-pin--user' : 'insolit-pin'
 
   const icon = L.divIcon({
     className: 'insolit-pin-wrapper',
-    html: `<div class="insolit-pin"><span>${emoji}</span></div>`,
+    html: `<div class="${pinClass}"><span class="insolit-pin-inner">${inner}</span></div>`,
     iconSize: [34, 44],
     iconAnchor: [17, 44],
   })
 
-  iconCache.set(emoji, icon)
+  iconCache.set(cacheKey, icon)
   return icon
 }
 
@@ -89,7 +97,7 @@ export default function MapView() {
         promoId: promo.id,
         lat: promo.latitude,
         lng: promo.longitude,
-        emoji: promo.category_icon || '🎉',
+        pinIconKey: categoryToPinIconKey(promo.category),
         name: promo.title,
         merchant: promo.merchants?.name || 'Marchand',
         category: promo.category || 'Offre',
@@ -99,7 +107,7 @@ export default function MapView() {
   const filters = useMemo(() => {
     const categories = [...new Set(allMarkers.map((marker) => marker.category).filter(Boolean))]
     return [
-      { key: 'all', label: '✨ Toutes' },
+      { key: 'all', label: 'Toutes' },
       ...categories.map((category) => ({ key: category, label: category })),
     ]
   }, [allMarkers])
@@ -173,84 +181,117 @@ export default function MapView() {
   }, [isNearMeActive, userLocation, visibleMarkers])
 
   return (
-    <div className="flex h-[calc(100dvh-5rem)] w-full flex-col overflow-hidden bg-dark-bg text-theme md:h-[calc(100dvh-4rem)]">
-      <header className="max-w-7xl mx-auto w-full shrink-0 px-4 pt-4 pb-3 sm:px-6 lg:px-8">
-        <div className="mb-4 sm:mb-5">
-          <h1 className="text-2xl sm:text-3xl font-bold leading-tight mb-1">
-            <span className="bg-linear-to-r from-neon-purple to-neon-cyan bg-clip-text text-transparent">
-              Carte
-            </span>{' '}
-            des offres
-          </h1>
-          <p className="text-sm sm:text-base text-theme-muted">
-            Repère les bons plans autour de toi
-          </p>
-        </div>
+    <div className="page-shell flex h-[calc(100dvh-5rem)] w-full flex-col overflow-hidden text-theme md:h-[calc(100dvh-4rem)]">
+      <header className="shrink-0 px-4 pt-3 pb-2 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-sm backdrop-blur-md dark:border-dark-border dark:bg-dark-card/95">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap items-end justify-between gap-3 border-b border-slate-100 pb-3 dark:border-dark-border/80">
+              <div>
+                <h1 className="text-xl font-bold leading-tight sm:text-2xl">
+                  <span className="text-insolit-pink">Carte</span>{' '}
+                  <span className="text-theme">des offres</span>
+                </h1>
+                <p className="mt-0.5 text-xs text-theme-muted sm:text-sm">
+                  Explore et filtre les promos géolocalisées
+                </p>
+              </div>
+              <p className="text-xs font-medium tabular-nums text-theme-muted">
+                {visibleMarkers.length} sur {allMarkers.length}
+              </p>
+            </div>
 
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Ex. : burger, soirée, sport…"
-          className="input-theme rounded-2xl"
-        />
+            <div className="relative">
+              <Search
+                className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-gray-500"
+                strokeWidth={2}
+                aria-hidden
+              />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Rechercher une offre…"
+                className="input-theme rounded-xl py-3 pl-11 pr-4 shadow-none dark:shadow-none"
+                aria-label="Rechercher sur la carte"
+              />
+            </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={handleNearMeClick}
-            disabled={isLocating}
-            className={`${isNearMeActive ? chipActive : chipInactive} disabled:cursor-not-allowed disabled:opacity-60`}
-          >
-            {isLocating
-              ? 'Localisation…'
-              : isNearMeActive
-                ? '📍 Près de moi (actif)'
-                : '📍 Près de moi'}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setIsFavoritesOnly((prev) => !prev)}
-            className={isFavoritesOnly ? chipActive : chipInactive}
-          >
-            {isFavoritesOnly ? '❤️ Favoris uniquement' : '🤍 Favoris'}
-          </button>
-
-          {isNearMeActive && (
-            <span className="text-xs text-theme-muted">Rayon : {NEAR_ME_RADIUS_KM} km</span>
-          )}
-        </div>
-
-        {geoError && (
-          <p className="mt-2 text-xs text-red-400 dark:text-red-400">{geoError}</p>
-        )}
-
-        <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
-          {filters.map((filter) => {
-            const active = activeFilter === filter.key
-            return (
+            <div className="flex flex-wrap items-center gap-2">
               <button
-                key={filter.key}
                 type="button"
-                onClick={() => setActiveFilter(filter.key)}
-                className={active ? chipActive : chipInactive}
+                onClick={handleNearMeClick}
+                disabled={isLocating}
+                className={`${isNearMeActive ? chipActive : chipInactive} disabled:cursor-not-allowed disabled:opacity-60`}
               >
-                {filter.label}
+                {isLocating ? (
+                  <Loader2 className="h-4 w-4 shrink-0 animate-spin" strokeWidth={2} aria-hidden />
+                ) : (
+                  <Navigation className="h-4 w-4 shrink-0" strokeWidth={2} aria-hidden />
+                )}
+                {isLocating ? 'Localisation…' : isNearMeActive ? 'Près de moi (actif)' : 'Près de moi'}
               </button>
-            )
-          })}
+
+              <button
+                type="button"
+                onClick={() => setIsFavoritesOnly((prev) => !prev)}
+                className={isFavoritesOnly ? chipActive : chipInactive}
+                aria-pressed={isFavoritesOnly}
+              >
+                <Heart
+                  className="h-4 w-4 shrink-0"
+                  strokeWidth={2}
+                  aria-hidden
+                  fill={isFavoritesOnly ? 'currentColor' : 'none'}
+                />
+                {isFavoritesOnly ? 'Favoris uniquement' : 'Favoris'}
+              </button>
+
+              {isNearMeActive && (
+                <span className="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-2.5 py-1 text-xs text-theme-muted dark:bg-dark-surface">
+                  <MapPin className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />
+                  Rayon {NEAR_ME_RADIUS_KM} km
+                </span>
+              )}
+            </div>
+
+            {geoError && (
+              <p className="rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-600 dark:text-red-400">
+                {geoError}
+              </p>
+            )}
+
+            <div className="flex gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {filters.map((filter) => {
+                const active = activeFilter === filter.key
+                return (
+                  <button
+                    key={filter.key}
+                    type="button"
+                    onClick={() => setActiveFilter(filter.key)}
+                    className={active ? chipActive : chipInactive}
+                  >
+                    {filter.key === 'all' ? (
+                      <LayoutGrid className="h-4 w-4 shrink-0 opacity-90" strokeWidth={2} aria-hidden />
+                    ) : (
+                      <CategoryGlyph categoryLabel={filter.label} className="h-4 w-4 shrink-0 opacity-90" />
+                    )}
+                    {filter.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
         </div>
       </header>
 
-      <main className="relative flex min-h-0 flex-1 px-4 pb-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex h-full w-full min-h-0">
-          <div className="h-full w-full min-h-0 overflow-hidden rounded-2xl border border-dark-border bg-dark-card shadow-lg shadow-neon-purple/5 dark:shadow-neon-purple/10">
+      <main className="relative flex min-h-0 flex-1 px-4 pb-4 pt-2 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-full w-full min-h-0 max-w-7xl">
+          <div className="relative h-full min-h-0 w-full overflow-hidden rounded-2xl border border-slate-200/90 bg-slate-100/80 ring-1 ring-black/[0.04] dark:border-dark-border dark:bg-dark-surface/50 dark:ring-white/5">
             <MapContainer
               center={mapCenter}
               zoom={11}
               scrollWheelZoom
-              className="map-view-leaflet z-0"
+              className="map-view-leaflet z-0 !h-full !min-h-[12rem]"
               style={{ height: '100%', width: '100%' }}
             >
               <MapAutoCenter center={mapCenter} zoom={isNearMeActive && userLocation ? 13 : 11} />
@@ -259,9 +300,14 @@ export default function MapView() {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
               {isNearMeActive && userLocation && (
-                <Marker position={[userLocation.lat, userLocation.lng]} icon={getPinIcon('📍')}>
+                <Marker
+                  position={[userLocation.lat, userLocation.lng]}
+                  icon={getPinLeafletIcon('user', 'user')}
+                >
                   <Popup>
-                    <p className="font-semibold text-slate-900">Tu es ici</p>
+                    <p className="m-0 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                      Ta position
+                    </p>
                   </Popup>
                 </Marker>
               )}
@@ -269,20 +315,26 @@ export default function MapView() {
                 <Marker
                   key={marker.id}
                   position={[marker.lat, marker.lng]}
-                  icon={getPinIcon(marker.emoji)}
+                  icon={getPinLeafletIcon(marker.pinIconKey, 'promo')}
                 >
                   <Popup>
-                    <div className="min-w-[11rem] text-slate-900">
-                      <div className="mb-2 flex items-center gap-2">
-                        <span className="text-lg">{marker.emoji}</span>
-                        <p className="text-sm font-semibold text-neon-cyan">{marker.category}</p>
+                    <div className="min-w-[12rem] max-w-[16rem] py-1 text-slate-900 dark:text-slate-100">
+                      <div className="mb-2 flex items-start gap-2.5">
+                        <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-insolit-pink/10 text-insolit-pink">
+                          <CategoryGlyph categoryLabel={marker.category} className="h-4 w-4" />
+                        </span>
+                        <div className="min-w-0">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-insolit-pink">
+                            {marker.category}
+                          </p>
+                          <p className="mt-0.5 text-sm font-semibold leading-snug">{marker.name}</p>
+                        </div>
                       </div>
-                      <p className="mb-1 font-semibold">{marker.name}</p>
-                      <p className="mb-3 text-xs text-slate-600">{marker.merchant}</p>
+                      <p className="mb-3 text-xs text-slate-600 dark:text-gray-400">{marker.merchant}</p>
                       {marker.promoId && (
                         <Link
                           to={`/promo/${marker.promoId}`}
-                          className="inline-flex items-center rounded-lg bg-linear-to-r from-neon-purple to-neon-cyan px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
+                          className="inline-flex w-full items-center justify-center rounded-full bg-insolit-pink py-2 text-xs font-semibold text-white transition-opacity hover:bg-insolit-pink-hover"
                         >
                           Voir la promo
                         </Link>
@@ -294,15 +346,18 @@ export default function MapView() {
             </MapContainer>
           </div>
         </div>
+
         {isNearMeActive && visibleMarkers.length === 0 && (
-          <p className="absolute bottom-6 left-1/2 z-[400] max-w-md -translate-x-1/2 rounded-lg border border-dark-border bg-dark-card px-4 py-2 text-center text-xs text-theme-muted shadow-lg">
+          <div className="absolute bottom-5 left-1/2 z-[400] flex max-w-sm -translate-x-1/2 items-center gap-2 rounded-2xl border border-slate-200/90 bg-white px-4 py-3 text-xs text-theme-muted shadow-lg dark:border-dark-border dark:bg-dark-card">
+            <MapPin className="h-4 w-4 shrink-0 text-insolit-pink" strokeWidth={2} aria-hidden />
             Aucune offre dans un rayon de {NEAR_ME_RADIUS_KM} km.
-          </p>
+          </div>
         )}
         {isFavoritesOnly && visibleMarkers.length === 0 && (
-          <p className="absolute bottom-6 left-1/2 z-[400] max-w-md -translate-x-1/2 rounded-lg border border-dark-border bg-dark-card px-4 py-2 text-center text-xs text-theme-muted shadow-lg">
+          <div className="absolute bottom-5 left-1/2 z-[400] flex max-w-sm -translate-x-1/2 items-center gap-2 rounded-2xl border border-slate-200/90 bg-white px-4 py-3 text-xs text-theme-muted shadow-lg dark:border-dark-border dark:bg-dark-card">
+            <Heart className="h-4 w-4 shrink-0 text-insolit-pink" strokeWidth={2} aria-hidden />
             Aucun favori avec une position sur la carte.
-          </p>
+          </div>
         )}
       </main>
     </div>

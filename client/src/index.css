@@ -5,6 +5,9 @@
 @theme {
   --color-neon-purple: #a855f7;
   --color-neon-cyan: #22d3ee;
+  /* Marque mobile INSOLIT — accent principal web */
+  --color-insolit-pink: #ff2e9c;
+  --color-insolit-pink-hover: #e91a85;
   --color-dark-bg: #f8fafc;
   --color-dark-card: #ffffff;
   --color-dark-surface: #f1f5f9;
@@ -41,7 +44,12 @@ html.dark body {
     @apply text-slate-500 dark:text-gray-500;
   }
   .input-theme {
-    @apply w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 transition-colors focus:outline-none focus:border-neon-purple dark:border-dark-border dark:bg-dark-surface dark:text-white dark:placeholder-gray-500;
+    @apply w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm placeholder-slate-400 transition-colors focus:outline-none focus:border-insolit-pink focus:ring-2 focus:ring-insolit-pink/20 dark:border-dark-border dark:bg-dark-surface dark:shadow-none dark:focus:ring-insolit-pink/25 dark:text-white dark:placeholder-gray-500;
+  }
+
+  /* Fond type app mobile : léger dégradé froid → blanc (mode clair uniquement) */
+  .page-shell {
+    @apply bg-gradient-to-b from-sky-50/70 via-white to-slate-50 dark:from-dark-bg dark:via-dark-bg dark:to-dark-bg;
   }
 }
 
@@ -57,26 +65,83 @@ html.dark body {
   min-height: 0;
 }
 
+.map-view-leaflet .leaflet-popup-content-wrapper {
+  border-radius: 1rem;
+  padding: 0.35rem 0.65rem;
+  box-shadow:
+    0 12px 40px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(15, 23, 42, 0.06);
+}
+
+.map-view-leaflet .leaflet-popup-content {
+  margin: 0.35rem 0.5rem;
+  line-height: 1.45;
+}
+
+html.dark .map-view-leaflet .leaflet-popup-content-wrapper {
+  background: var(--color-dark-card);
+  color: #e2e8f0;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+html.dark .map-view-leaflet .leaflet-popup-tip {
+  background: var(--color-dark-card);
+}
+
 .insolit-pin-wrapper {
   background: transparent;
   border: none;
 }
 
+/* Pins carte : fond blanc, cadrage rose (style app mobile) */
 .insolit-pin {
   position: relative;
   width: 34px;
   height: 34px;
   border-radius: 17px 17px 17px 0;
   transform: rotate(-45deg);
-  background: linear-gradient(160deg, #c084fc, #22d3ee);
+  background: #ffffff;
+  border: solid 2.5px #ff2e9c;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 14px rgba(168, 85, 247, 0.4);
+  box-shadow:
+    0 2px 0 rgba(255, 46, 156, 0.12),
+    0 6px 14px rgba(15, 23, 42, 0.12);
 }
 
-.insolit-pin span {
+html.dark .insolit-pin {
+  background: #ffffff;
+  box-shadow:
+    0 2px 0 rgba(255, 46, 156, 0.2),
+    0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.insolit-pin--user {
+  border-color: #0ea5e9;
+  box-shadow:
+    0 2px 0 rgba(14, 165, 233, 0.15),
+    0 6px 14px rgba(15, 23, 42, 0.12);
+}
+
+html.dark .insolit-pin--user {
+  background: #ffffff;
+  box-shadow:
+    0 2px 0 rgba(14, 165, 233, 0.25),
+    0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.insolit-pin-inner {
   transform: rotate(45deg);
-  font-size: 16px;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+.insolit-pin-inner svg {
+  display: block;
 }

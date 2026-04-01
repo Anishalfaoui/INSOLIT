@@ -1,21 +1,34 @@
+import { LayoutGrid } from 'lucide-react'
+import CategoryGlyph from './CategoryGlyph'
+
 export default function CategoryFilter({ selected, onChange, categories }) {
   const allCategories = ['Tous', ...categories.map((cat) => cat.label)]
 
+  const chipActive =
+    'inline-flex items-center gap-2 rounded-full bg-insolit-pink px-4 py-2 text-sm font-medium text-white shadow-md shadow-pink-500/30 transition-all hover:bg-insolit-pink-hover cursor-pointer'
+  const chipInactive =
+    'inline-flex items-center gap-2 rounded-full border border-slate-200/90 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-all hover:border-insolit-pink/40 cursor-pointer dark:border-dark-border dark:bg-dark-surface dark:text-gray-300 dark:shadow-none dark:hover:border-insolit-pink/50'
+
   return (
     <div className="flex flex-wrap gap-2">
-      {allCategories.map((cat) => (
-        <button
-          key={cat}
-          onClick={() => onChange(cat === 'Tous' ? null : cat)}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-all cursor-pointer ${
-            (cat === 'Tous' && !selected) || selected === cat
-              ? 'bg-gradient-to-r from-neon-purple to-neon-cyan text-white shadow-lg shadow-neon-purple/20'
-              : 'bg-dark-card border border-dark-border text-slate-600 hover:border-neon-purple/50 hover:text-slate-900 dark:text-gray-400 dark:hover:text-white'
-          }`}
-        >
-          {cat}
-        </button>
-      ))}
+      {allCategories.map((cat) => {
+        const active = (cat === 'Tous' && !selected) || selected === cat
+        return (
+          <button
+            key={cat}
+            type="button"
+            onClick={() => onChange(cat === 'Tous' ? null : cat)}
+            className={active ? chipActive : chipInactive}
+          >
+            {cat === 'Tous' ? (
+              <LayoutGrid className="h-4 w-4 shrink-0 opacity-95" strokeWidth={2} aria-hidden />
+            ) : (
+              <CategoryGlyph categoryLabel={cat} className="h-4 w-4 shrink-0 opacity-95" strokeWidth={2} />
+            )}
+            {cat}
+          </button>
+        )
+      })}
     </div>
   )
 }
