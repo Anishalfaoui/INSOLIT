@@ -44,6 +44,9 @@ export default function Navbar() {
                     <NavLink to="/" className={navLinkClass} end>
                       Bons Plans
                     </NavLink>
+                    <NavLink to="/favorites" className={navLinkClass}>
+                      Favoris
+                    </NavLink>
                     <NavLink to="/map" className={navLinkClass}>
                       Carte
                     </NavLink>
@@ -120,6 +123,15 @@ export default function Navbar() {
                   <span>Offres</span>
                 </NavLink>
                 <NavLink
+                  to="/favorites"
+                  className={({ isActive }) =>
+                    `flex flex-col items-center rounded-lg py-2 text-xs transition-colors ${isActive ? 'text-neon-cyan bg-dark-surface' : 'text-gray-400'}`
+                  }
+                >
+                  <span className="text-base">❤️</span>
+                  <span>Favoris</span>
+                </NavLink>
+                <NavLink
                   to="/map"
                   className={({ isActive }) =>
                     `flex flex-col items-center rounded-lg py-2 text-xs transition-colors ${isActive ? 'text-neon-cyan bg-dark-surface' : 'text-gray-400'}`
@@ -137,13 +149,6 @@ export default function Navbar() {
                   <span className="text-base">👤</span>
                   <span>Compte</span>
                 </NavLink>
-                <button
-                  onClick={signOut}
-                  className="flex flex-col items-center rounded-lg py-2 text-xs transition-colors text-gray-400 cursor-pointer"
-                >
-                  <span className="text-base">🚪</span>
-                  <span>Déco</span>
-                </button>
               </>
             )}
           </div>

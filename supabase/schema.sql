@@ -6,6 +6,7 @@
 -- Clean existing objects to ensure exact compatibility with the target model.
 -- Avoid DROP POLICY here because PostgreSQL errors if the table does not exist.
 
+DROP TABLE IF EXISTS favorites;
 DROP TABLE IF EXISTS redemptions;
 DROP TABLE IF EXISTS promos;
 DROP TABLE IF EXISTS merchants;
@@ -69,6 +70,15 @@ ALTER TABLE promos ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Promos are publicly readable"
   ON promos FOR SELECT
   USING (true);
+
+-- FAVORITE
+CREATE TABLE favorites (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  promo_id UUID REFERENCES promos(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, promo_id)
+);
 
 -- REDEMPTION
 CREATE TABLE redemptions (

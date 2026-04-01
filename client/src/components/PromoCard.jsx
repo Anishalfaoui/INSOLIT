@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useFavorites } from '../context/FavoritesContext'
 
 const ICONS_BY_CATEGORY = {
   food: ['🍜', '🍕', '🍔', '🥗'],
@@ -33,18 +34,37 @@ function pickCategoryIcon(promo) {
 
 export default function PromoCard({ promo }) {
   const cardIcon = pickCategoryIcon(promo)
+  const { isFavorite, toggleFavorite } = useFavorites()
+  const favorited = isFavorite(promo.id)
+
+  function handleFavoriteClick(e) {
+    e.preventDefault()
+    e.stopPropagation()
+    toggleFavorite(promo.id)
+  }
 
   return (
     <Link
       to={`/promo/${promo.id}`}
-      className="group block bg-dark-card border border-dark-border rounded-2xl p-4 hover:border-neon-purple/50 transition-all hover:shadow-lg hover:shadow-neon-purple/10"
+      className="group relative block bg-dark-card border border-dark-border rounded-2xl p-4 hover:border-neon-purple/50 transition-all hover:shadow-lg hover:shadow-neon-purple/10"
     >
+      <button
+        type="button"
+        onClick={handleFavoriteClick}
+        aria-label={favorited ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+        className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-dark-surface/80 hover:bg-dark-surface transition-colors cursor-pointer"
+      >
+        <span className="text-base leading-none">
+          {favorited ? '❤️' : '🤍'}
+        </span>
+      </button>
+
       <div className="flex items-start gap-3">
         <div className="shrink-0 w-14 h-14 rounded-xl bg-linear-to-br from-neon-purple/20 to-neon-cyan/20 border border-neon-cyan/20 flex items-center justify-center text-3xl group-hover:scale-105 transition-transform duration-300">
           <span aria-hidden>{cardIcon}</span>
         </div>
 
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 pr-6">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-medium text-neon-cyan bg-neon-cyan/10 px-2 py-1 rounded-full">
               {promo.category_icon ? `${promo.category_icon} ` : ''}{promo.category || 'Sans categorie'}

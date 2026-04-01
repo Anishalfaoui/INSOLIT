@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { PartnerAuthProvider } from './context/PartnerAuthContext'
+import { FavoritesProvider } from './context/FavoritesContext'
 import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
 import ProtectedPartnerRoute from './components/ProtectedPartnerRoute'
@@ -15,6 +16,7 @@ import PartnerLogin from './pages/partner/PartnerLogin'
 import PartnerRegister from './pages/partner/PartnerRegister'
 import PartnerDashboard from './pages/partner/PartnerDashboard'
 import AdminDashboard from './pages/AdminDashboard'
+import Favorites from './pages/Favorites'
 
 function MemberOnlyRoute({ children }) {
   const { user, loading } = useAuth()
@@ -90,6 +92,16 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/favorites"
+          element={
+            <ProtectedRoute>
+              <MemberOnlyRoute>
+                <Favorites />
+              </MemberOnlyRoute>
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </div>
   )
@@ -100,7 +112,9 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <PartnerAuthProvider>
-          <AppRoutes />
+          <FavoritesProvider>
+            <AppRoutes />
+          </FavoritesProvider>
         </PartnerAuthProvider>
       </AuthProvider>
     </BrowserRouter>
