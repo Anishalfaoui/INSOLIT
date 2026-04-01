@@ -30,7 +30,7 @@ export default function Login() {
         <h1 className="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-neon-purple to-neon-cyan bg-clip-text text-transparent">
           Connexion
         </h1>
-        <p className="text-gray-400 text-center mb-8">Accède à tes bons plans insolites</p>
+        <p className="text-theme-muted text-center mb-8">Accède à tes bons plans insolites</p>
 
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg p-3 mb-4">
@@ -40,24 +40,24 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Email</label>
+            <label className="block text-sm text-theme-muted mb-1">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full bg-dark-surface border border-dark-border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-neon-purple transition-colors"
+              className="input-theme"
               placeholder="ton@email.com"
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Mot de passe</label>
+            <label className="block text-sm text-theme-muted mb-1">Mot de passe</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full bg-dark-surface border border-dark-border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-neon-purple transition-colors"
+              className="input-theme"
               placeholder="••••••••"
             />
           </div>
@@ -70,7 +70,7 @@ export default function Login() {
           </button>
         </form>
 
-        <p className="text-center text-gray-400 text-sm mt-6">
+        <p className="text-center text-theme-muted text-sm mt-6">
           Pas encore de compte ?{' '}
           <Link to="/register" className="text-neon-purple hover:underline">
             S'inscrire

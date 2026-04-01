@@ -76,16 +76,16 @@ export default function PromoCard({ promo }) {
             )}
           </div>
 
-          <h3 className="mt-3 text-lg font-semibold text-white group-hover:text-neon-purple transition-colors line-clamp-2">
+          <h3 className="mt-3 text-lg font-semibold text-theme group-hover:text-neon-purple transition-colors line-clamp-2">
             {promo.title}
           </h3>
 
-          <p className="mt-1 text-sm text-gray-400 truncate">
+          <p className="mt-1 text-sm text-theme-muted truncate">
             {promo.merchants?.name || 'Marchand'}
           </p>
 
           {promo.end_date && (
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-theme-subtle">
               Jusqu'au {new Date(promo.end_date).toLocaleDateString('fr-FR')}
             </p>
           )}

@@ -1,8 +1,17 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-neon-purple: #a855f7;
   --color-neon-cyan: #22d3ee;
+  --color-dark-bg: #f8fafc;
+  --color-dark-card: #ffffff;
+  --color-dark-surface: #f1f5f9;
+  --color-dark-border: #e2e8f0;
+}
+
+html.dark {
   --color-dark-bg: #0f0f1a;
   --color-dark-card: #1a1a2e;
   --color-dark-surface: #16213e;
@@ -12,8 +21,28 @@
 body {
   margin: 0;
   background-color: var(--color-dark-bg);
-  color: #e2e8f0;
+  color: #0f172a;
   font-family: 'Inter', system-ui, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+html.dark body {
+  color: #e2e8f0;
+}
+
+@layer utilities {
+  .text-theme {
+    @apply text-slate-900 dark:text-slate-100;
+  }
+  .text-theme-muted {
+    @apply text-slate-600 dark:text-gray-400;
+  }
+  .text-theme-subtle {
+    @apply text-slate-500 dark:text-gray-500;
+  }
+  .input-theme {
+    @apply w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 transition-colors focus:outline-none focus:border-neon-purple dark:border-dark-border dark:bg-dark-surface dark:text-white dark:placeholder-gray-500;
+  }
 }
 
 .leaflet-container {

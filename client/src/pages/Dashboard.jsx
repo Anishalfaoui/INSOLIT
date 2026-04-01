@@ -42,7 +42,7 @@ export default function Dashboard() {
           </span>{' '}
           du moment
         </h1>
-        <p className="text-sm sm:text-base text-gray-400">Les meilleurs deals exclusifs pour les moins de 26 ans</p>
+        <p className="text-sm sm:text-base text-theme-muted">Les meilleurs deals exclusifs pour les moins de 26 ans</p>
       </div>
 
       <div className="mb-6 sm:mb-8">
@@ -54,7 +54,7 @@ export default function Dashboard() {
           <div className="w-8 h-8 border-2 border-neon-purple border-t-transparent rounded-full animate-spin" />
         </div>
       ) : promos.length === 0 ? (
-        <div className="text-center py-20 text-gray-400">
+        <div className="text-center py-20 text-theme-muted">
           <p className="text-5xl mb-4">😢</p>
           <p className="text-lg">Aucune promo trouvée dans cette catégorie</p>
         </div>

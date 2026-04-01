@@ -54,7 +54,7 @@ export default function Register() {
         <h1 className="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-neon-purple to-neon-cyan bg-clip-text text-transparent">
           Inscription
         </h1>
-        <p className="text-gray-400 text-center mb-8">Rejoins la communauté INSOLIT</p>
+        <p className="text-theme-muted text-center mb-8">Rejoins la communauté INSOLIT</p>
 
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg p-3 mb-4">
@@ -64,24 +64,24 @@ export default function Register() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Nom complet</label>
+            <label className="block text-sm text-theme-muted mb-1">Nom complet</label>
             <input
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
-              className="w-full bg-dark-surface border border-dark-border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-neon-purple transition-colors"
+              className="input-theme"
               placeholder="Jean Dupont"
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Email</label>
+            <label className="block text-sm text-theme-muted mb-1">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full bg-dark-surface border border-dark-border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-neon-purple transition-colors"
+              className="input-theme"
               placeholder="ton@email.com"
             />
           </div>
@@ -97,35 +97,35 @@ export default function Register() {
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Ville</label>
+            <label className="block text-sm text-theme-muted mb-1">Ville</label>
             <input
               type="text"
               value={city}
               onChange={(e) => setCity(e.target.value)}
               required
-              className="w-full bg-dark-surface border border-dark-border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-neon-purple transition-colors"
+              className="input-theme"
               placeholder="Paris"
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Date de naissance</label>
+            <label className="block text-sm text-theme-muted mb-1">Date de naissance</label>
             <input
               type="date"
               value={birthDate}
               onChange={(e) => setBirthDate(e.target.value)}
               required
-              className="w-full bg-dark-surface border border-dark-border rounded-lg px-4 py-3 text-white focus:outline-none focus:border-neon-purple transition-colors"
+              className="input-theme"
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Mot de passe</label>
+            <label className="block text-sm text-theme-muted mb-1">Mot de passe</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full bg-dark-surface border border-dark-border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-neon-purple transition-colors"
+              className="input-theme"
               placeholder="••••••••"
             />
           </div>
@@ -138,7 +138,7 @@ export default function Register() {
           </button>
         </form>
 
-        <p className="text-center text-gray-400 text-sm mt-6">
+        <p className="text-center text-theme-muted text-sm mt-6">
           Déjà un compte ?{' '}
           <Link to="/login" className="text-neon-purple hover:underline">
             Se connecter

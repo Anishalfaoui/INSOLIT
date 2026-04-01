@@ -59,7 +59,7 @@ export default function PromoDetail() {
   if (!promo) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <p className="text-xl text-gray-400">Promo introuvable</p>
+        <p className="text-xl text-theme-muted">Promo introuvable</p>
         <Link to="/" className="text-neon-purple hover:underline">Retour</Link>
       </div>
     )
@@ -93,7 +93,7 @@ export default function PromoDetail() {
           </div>
 
           <div className="flex items-start justify-between gap-4 mb-2">
-            <h1 className="text-3xl font-bold text-white">{promo.title}</h1>
+            <h1 className="text-3xl font-bold text-theme">{promo.title}</h1>
             <button
               onClick={() => toggleFavorite(promo.id)}
               aria-label={isFavorite(promo.id) ? 'Retirer des favoris' : 'Ajouter aux favoris'}
@@ -104,15 +104,15 @@ export default function PromoDetail() {
               </span>
             </button>
           </div>
-          <p className="text-gray-400 mb-6">{promo.merchants?.name || 'Marchand'}</p>
+          <p className="text-theme-muted mb-6">{promo.merchants?.name || 'Marchand'}</p>
 
-          <p className="text-gray-300 leading-relaxed mb-8">{promo.description}</p>
+          <p className="text-slate-700 dark:text-gray-300 leading-relaxed mb-8">{promo.description}</p>
 
           {promo.promo_code && (
             <div className="mb-8">
               {codeRevealed ? (
                 <div className="bg-dark-surface border-2 border-neon-purple rounded-xl p-6 text-center">
-                  <p className="text-sm text-gray-400 mb-2">Ton code promo</p>
+                  <p className="text-sm text-theme-muted mb-2">Ton code promo</p>
                   <p className="text-3xl font-mono font-bold text-neon-cyan tracking-widest">
                     {promo.promo_code}
                   </p>
@@ -132,7 +132,7 @@ export default function PromoDetail() {
           )}
 
           {promo.end_date && (
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-sm text-theme-subtle mb-6">
               Valable jusqu'au {new Date(promo.end_date).toLocaleDateString('fr-FR')}
             </p>
           )}
