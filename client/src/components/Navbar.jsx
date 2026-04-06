@@ -8,10 +8,12 @@ import {
   User,
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { usePartner } from '../context/usePartner'
 import ThemeToggle from './ThemeToggle'
 
 export default function Navbar() {
   const { user, signOut } = useAuth()
+  const { partner, partnerSignOut } = usePartner()
   const { pathname } = useLocation()
   const onLoginPage = pathname === '/login'
 
@@ -40,12 +42,20 @@ export default function Navbar() {
       </div>
       <nav className="sticky top-0 z-50 hidden border-b border-dark-border bg-dark-card/80 backdrop-blur-md md:block">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="text-2xl font-bold lowercase tracking-tight text-insolit-pink">insolit</span>
-            <span className="rounded-full bg-insolit-pink/15 px-2 py-0.5 text-xs font-medium text-insolit-pink">
-              -26 ans
-            </span>
-          </Link>
+          <div className="flex flex-col items-start">
+            <Link to="/" className="flex items-center gap-2">
+              <span className="text-2xl font-bold lowercase tracking-tight text-insolit-pink">insolit</span>
+              <span className="rounded-full bg-insolit-pink/15 px-2 py-0.5 text-xs font-medium text-insolit-pink">
+                -26 ans
+              </span>
+            </Link>
+            <Link
+              to="/partner/login"
+              className="mt-1 text-[11px] text-theme-subtle transition-colors hover:text-neon-cyan"
+            >
+              Espace partenaire
+            </Link>
+          </div>
           <div className="flex items-center gap-3 sm:gap-4">
             <ThemeToggle />
             {user ? (
@@ -76,6 +86,17 @@ export default function Navbar() {
                   </>
                 )}
                 <button type="button" onClick={signOut} className={signOutPillClass}>
+                  <LogOut className="h-4 w-4 shrink-0 opacity-90" strokeWidth={2} aria-hidden />
+                  Déconnexion
+                </button>
+              </>
+            ) : partner ? (
+              <>
+                <NavLink to="/partner/dashboard" className={navPillClass}>
+                  <Ticket className="h-4 w-4 shrink-0 opacity-90" strokeWidth={2} aria-hidden />
+                  Dashboard merchant
+                </NavLink>
+                <button type="button" onClick={partnerSignOut} className={signOutPillClass}>
                   <LogOut className="h-4 w-4 shrink-0 opacity-90" strokeWidth={2} aria-hidden />
                   Déconnexion
                 </button>
@@ -141,6 +162,33 @@ export default function Navbar() {
               </>
             )}
           </div>
+          <div className="pb-1 text-center">
+            <Link to="/partner/login" className="text-[11px] text-theme-subtle">
+              Espace partenaire
+            </Link>
+          </div>
+        </nav>
+      ) : partner ? (
+        <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-dark-border bg-dark-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden">
+          <div className="grid grid-cols-2 px-1 py-1">
+            <NavLink to="/partner/dashboard" className={({ isActive }) => mobileNavClass(isActive)}>
+              <Ticket className="h-5 w-5" strokeWidth={2} aria-hidden />
+              <span>Dashboard</span>
+            </NavLink>
+            <button
+              type="button"
+              onClick={partnerSignOut}
+              className="mx-0.5 flex flex-col items-center gap-0.5 rounded-lg border border-dark-border bg-dark-surface py-2 text-xs text-slate-500 transition-colors cursor-pointer dark:text-gray-400"
+            >
+              <LogOut className="h-5 w-5" strokeWidth={2} aria-hidden />
+              <span>Déco</span>
+            </button>
+          </div>
+          <div className="pb-1 text-center">
+            <Link to="/partner/dashboard" className="text-[11px] text-theme-subtle">
+              Espace partenaire
+            </Link>
+          </div>
         </nav>
       ) : (
         <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-dark-border bg-dark-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden">
@@ -158,6 +206,11 @@ export default function Navbar() {
               className="rounded-full bg-insolit-pink py-2 text-center text-sm font-semibold text-white hover:bg-insolit-pink-hover"
             >
               Inscription
+            </Link>
+          </div>
+          <div className="pb-1 text-center">
+            <Link to="/partner/login" className="text-[11px] text-theme-subtle">
+              Espace partenaire
             </Link>
           </div>
         </nav>

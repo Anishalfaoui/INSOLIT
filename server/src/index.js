@@ -7,6 +7,8 @@ import categoriesRouter from './routes/categories.js'
 import authRouter from './routes/auth.js'
 import favoritesRouter from './routes/favorites.js'
 import adminRouter from './routes/admin.js'
+import partnerRouter from './routes/partner.js'
+import partnerPromosRouter from './routes/partnerPromos.js'
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -20,6 +22,8 @@ app.use('/api/categories', categoriesRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/favorites', favoritesRouter)
 app.use('/api/admin', adminRouter)
+app.use('/api/partner', partnerRouter)
+app.use('/api/partner', partnerPromosRouter)
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' })

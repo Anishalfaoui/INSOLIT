@@ -8,6 +8,7 @@ export default function Dashboard() {
   const [categories, setCategories] = useState([])
   const [category, setCategory] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     fetchCategories()
@@ -18,20 +19,38 @@ export default function Dashboard() {
   }, [category])
 
   async function fetchCategories() {
-    const res = await fetch('/api/categories')
-    const data = await res.json()
-    setCategories(Array.isArray(data) ? data : [])
+    try {
+      const res = await fetch('/api/categories')
+      const data = await res.json().catch(() => [])
+      setCategories(Array.isArray(data) ? data : [])
+    } catch {
+      setCategories([])
+    }
   }
 
   async function fetchPromos() {
     setLoading(true)
+    setError('')
     const url = category
       ? `/api/promos?category=${encodeURIComponent(category)}`
       : '/api/promos'
-    const res = await fetch(url)
-    const data = await res.json()
-    setPromos(data)
-    setLoading(false)
+    try {
+      const res = await fetch(url)
+      const data = await res.json().catch(() => ({}))
+
+      if (!res.ok) {
+        setPromos([])
+        setError(data?.error || 'Impossible de charger les promos')
+        return
+      }
+
+      setPromos(Array.isArray(data) ? data : [])
+    } catch {
+      setPromos([])
+      setError('Impossible de charger les promos')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -50,6 +69,12 @@ export default function Dashboard() {
         <div className="mb-6 sm:mb-8">
           <CategoryFilter selected={category} onChange={setCategory} categories={categories} />
         </div>
+
+        {error && (
+          <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-600 dark:text-red-400">
+            {error}
+          </div>
+        )}
 
         {loading ? (
           <div className="flex justify-center py-20">

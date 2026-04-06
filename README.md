@@ -16,7 +16,8 @@ Application de bons plans exclusifs pour les moins de 26 ans. Stack : React (Vit
 
 1. Crée un projet sur [supabase.com](https://supabase.com)
 2. Exécute `supabase/schema.sql` dans le SQL Editor
-3. Exécute `supabase/seed.sql` pour les données de test
+3. Exécute `supabase/schema_partner.sql` dans le SQL Editor (migration manuelle auth marchands + status promos)
+4. Exécute `supabase/seed.sql` pour les données de test
 
 ### 2. Variables d'environnement
 

@@ -1,9 +1,11 @@
 import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
+import { PartnerAuthProvider } from './context/PartnerAuthContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { FavoritesProvider } from './context/FavoritesContext'
 import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
+import ProtectedPartnerRoute from './components/ProtectedPartnerRoute'
 import { useAuth } from './context/AuthContext'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -13,6 +15,9 @@ import MapView from './pages/MapView'
 import Account from './pages/Account'
 import Favorites from './pages/Favorites'
 import AdminDashboard from './pages/AdminDashboard'
+import PartnerLogin from './pages/partner/PartnerLogin'
+import PartnerRegister from './pages/partner/PartnerRegister'
+import PartnerDashboard from './pages/partner/PartnerDashboard'
 
 function MemberOnlyRoute({ children }) {
   const { user, loading } = useAuth()
@@ -28,6 +33,16 @@ function AppRoutes() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/partner/login" element={<PartnerLogin />} />
+        <Route path="/partner/register" element={<PartnerRegister />} />
+        <Route
+          path="/partner/dashboard"
+          element={(
+            <ProtectedPartnerRoute>
+              <PartnerDashboard />
+            </ProtectedPartnerRoute>
+          )}
+        />
         <Route
           path="/"
           element={
@@ -89,9 +104,11 @@ function App() {
     <BrowserRouter>
       <ThemeProvider>
         <AuthProvider>
-          <FavoritesProvider>
-            <AppRoutes />
-          </FavoritesProvider>
+          <PartnerAuthProvider>
+            <FavoritesProvider>
+              <AppRoutes />
+            </FavoritesProvider>
+          </PartnerAuthProvider>
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>

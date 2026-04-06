@@ -30,15 +30,55 @@ function normalizePromo(promo) {
   }
 }
 
+function isMissingStatusColumn(error) {
+  const message = String(error?.message || '').toLowerCase()
+  return message.includes('status') && message.includes('column')
+}
+
+function getTodayDateString() {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+async function expireOutdatedPromosIfPossible() {
+  const today = getTodayDateString()
+  const { error } = await supabase
+    .from('promos')
+    .update({ status: 'expired' })
+    .eq('status', 'active')
+    .lt('end_date', today)
+
+  // Ignore until schema_partner.sql is applied.
+  if (error && !isMissingStatusColumn(error)) {
+    throw error
+  }
+}
+
 export async function getAllPromos(req, res) {
   const { category } = req.query
 
-  const query = supabase
+  try {
+    await expireOutdatedPromosIfPossible()
+  } catch (error) {
+    return res.status(500).json({ error: error.message })
+  }
+
+  const buildQuery = () => supabase
     .from('promos')
     .select('*, merchants(name, address, coordinates, categories(label, icon))')
     .order('end_date', { ascending: true, nullsFirst: false })
 
-  const { data, error } = await query
+  let { data, error } = await buildQuery().eq('status', 'active')
+
+  // Backward compatibility until schema_partner.sql is executed.
+  if (error && isMissingStatusColumn(error)) {
+    const fallback = await buildQuery()
+    data = fallback.data
+    error = fallback.error
+  }
 
   if (error) {
     return res.status(500).json({ error: error.message })
@@ -55,11 +95,25 @@ export async function getAllPromos(req, res) {
 export async function getPromoById(req, res) {
   const { id } = req.params
 
-  const { data, error } = await supabase
+  try {
+    await expireOutdatedPromosIfPossible()
+  } catch (error) {
+    return res.status(500).json({ error: error.message })
+  }
+
+  const buildQuery = () => supabase
     .from('promos')
     .select('*, merchants(name, address, coordinates, categories(label, icon))')
     .eq('id', id)
-    .single()
+
+  let { data, error } = await buildQuery().eq('status', 'active').single()
+
+  // Backward compatibility until schema_partner.sql is executed.
+  if (error && isMissingStatusColumn(error)) {
+    const fallback = await buildQuery().single()
+    data = fallback.data
+    error = fallback.error
+  }
 
   if (error) {
     return res.status(404).json({ error: 'Promo introuvable' })
