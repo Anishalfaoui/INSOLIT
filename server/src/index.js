@@ -11,7 +11,14 @@ import partnerPromosRouter from './routes/partnerPromos.js'
 const app = express()
 const PORT = process.env.PORT || 3001
 
-app.use(cors())
+const corsOptions = {
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}
+
+app.use(cors(corsOptions))
+app.options('*', cors(corsOptions))
 app.use(express.json())
 
 app.use('/api/promos', promosRouter)
