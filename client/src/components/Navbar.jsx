@@ -1,8 +1,20 @@
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { usePartner } from '../context/usePartner'
 
 export default function Navbar() {
   const { user, signOut } = useAuth()
+  const { partner, partnerSignOut } = usePartner()
+  const { pathname } = useLocation()
+
+  const isAuthPage = [
+    '/login',
+    '/register',
+    '/partner/login',
+    '/partner/register',
+    '/login-partner',
+    '/register-partner',
+  ].includes(pathname)
 
   function navLinkClass({ isActive }) {
     return `text-sm transition-colors ${isActive ? 'text-neon-cyan' : 'text-gray-300 hover:text-neon-cyan'}`
@@ -20,6 +32,11 @@ export default function Navbar() {
               -26 ans
             </span>
           </Link>
+          {!isAuthPage && (
+            <Link to="/partner/login" className="text-xs text-gray-400 hover:text-neon-cyan transition-colors">
+              Espace partenaire
+            </Link>
+          )}
           <div className="flex items-center gap-4">
             {user ? (
               <>
@@ -39,13 +56,27 @@ export default function Navbar() {
                   Déconnexion
                 </button>
               </>
+            ) : partner ? (
+              <>
+                <NavLink to="/partner/dashboard" className={navLinkClass}>
+                  Dashboard partner
+                </NavLink>
+                <button
+                  onClick={partnerSignOut}
+                  className="text-sm bg-dark-surface border border-dark-border px-4 py-2 rounded-lg hover:border-neon-cyan/50 transition-colors cursor-pointer"
+                >
+                  Déconnexion
+                </button>
+              </>
             ) : (
-              <Link
-                to="/login"
-                className="text-sm bg-linear-to-r from-neon-purple to-neon-cyan px-4 py-2 rounded-lg font-medium text-white hover:opacity-90 transition-opacity"
-              >
-                Connexion
-              </Link>
+              !isAuthPage && (
+                <Link
+                  to="/login"
+                  className="text-sm bg-linear-to-r from-neon-purple to-neon-cyan px-4 py-2 rounded-lg font-medium text-white hover:opacity-90 transition-opacity"
+                >
+                  Connexion
+                </Link>
+              )
             )}
           </div>
         </div>
@@ -53,7 +84,7 @@ export default function Navbar() {
 
       {user ? (
         <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-dark-border bg-dark-card/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)]">
-          <div className="grid grid-cols-3 px-1 py-1">
+          <div className="grid px-1 py-1 grid-cols-3">
             <NavLink
               to="/"
               end
@@ -85,8 +116,34 @@ export default function Navbar() {
               <span>Compte</span>
             </NavLink>
           </div>
+          <div className="pb-1 text-center">
+            <Link to="/partner/login" className="text-[11px] text-gray-400">
+              Espace partenaire
+            </Link>
+          </div>
         </nav>
-      ) : (
+      ) : partner ? (
+        <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-dark-border bg-dark-card/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)]">
+          <div className="grid grid-cols-2 px-1 py-1">
+            <NavLink
+              to="/partner/dashboard"
+              className={({ isActive }) =>
+                `flex flex-col items-center rounded-lg py-2 text-xs transition-colors ${isActive ? 'text-neon-cyan bg-dark-surface' : 'text-gray-400'}`
+              }
+            >
+              <span className="text-base">🧾</span>
+              <span>Dashboard</span>
+            </NavLink>
+            <button
+              onClick={partnerSignOut}
+              className="flex flex-col items-center rounded-lg py-2 text-xs text-gray-400 border border-dark-border bg-dark-surface cursor-pointer"
+            >
+              <span className="text-base">🚪</span>
+              <span>Déconnexion</span>
+            </button>
+          </div>
+        </nav>
+      ) : !isAuthPage ? (
         <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-dark-border bg-dark-card/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)]">
           <div className="grid grid-cols-2 gap-2 px-3 py-2">
             <Link
@@ -102,8 +159,13 @@ export default function Navbar() {
               Inscription
             </Link>
           </div>
+          <div className="pb-1 text-center">
+            <Link to="/partner/login" className="text-[11px] text-gray-400">
+              Espace partenaire
+            </Link>
+          </div>
         </nav>
-      )}
+      ) : null}
     </>
   )
 }

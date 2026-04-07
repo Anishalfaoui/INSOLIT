@@ -27,6 +27,7 @@ export function AuthProvider({ children }) {
 
   async function restoreSession() {
     const token = getToken()
+
     if (!token) {
       setLoading(false)
       return
@@ -71,6 +72,7 @@ export function AuthProvider({ children }) {
       throw new Error(data.error || 'Erreur lors de l\'inscription')
     }
 
+    localStorage.removeItem('insolit_partner_token')
     setToken(data.token)
     setUser(data.user)
     return data
@@ -88,6 +90,7 @@ export function AuthProvider({ children }) {
       throw new Error(data.error || 'Identifiants invalides')
     }
 
+    localStorage.removeItem('insolit_partner_token')
     setToken(data.token)
     setUser(data.user)
     return data

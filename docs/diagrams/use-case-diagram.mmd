@@ -1,0 +1,47 @@
+flowchart LR
+  U([Utilisateur -26 ans])
+  P([Partenaire])
+  A([Admin technique])
+
+  subgraph INSOLIT[Systeme INSOLIT]
+    UC1([S'inscrire utilisateur])
+    UC2([Se connecter utilisateur])
+    UC3([Consulter dashboard promos])
+    UC4([Filtrer par categorie])
+    UC5([Voir detail promo])
+    UC6([Voir map des offres])
+    UC7([Claim une offre])
+    UC8([Mettre a jour profil])
+
+    UC9([S'inscrire partenaire])
+    UC10([Se connecter partenaire])
+    UC11([Voir dashboard partenaire])
+    UC12([Creer une offre])
+    UC13([Modifier une offre])
+    UC14([Supprimer une offre])
+
+    UC15([Maintenir API et configuration])
+  end
+
+  U --> UC1
+  U --> UC2
+  U --> UC3
+  U --> UC4
+  U --> UC5
+  U --> UC6
+  U --> UC7
+  U --> UC8
+
+  P --> UC9
+  P --> UC10
+  P --> UC11
+  P --> UC12
+  P --> UC13
+  P --> UC14
+
+  A --> UC15
+
+  UC7 -. inclut .-> UC5
+  UC12 -. inclut .-> UC11
+  UC13 -. inclut .-> UC11
+  UC14 -. inclut .-> UC11

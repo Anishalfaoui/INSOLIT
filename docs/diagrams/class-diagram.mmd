@@ -1,0 +1,94 @@
+classDiagram
+direction LR
+
+class User {
+  +uuid id
+  +string full_name
+  +string email
+  +date birthdate
+  +string city
+  +string avatar_url
+  +datetime created_at
+}
+
+class Merchant {
+  +uuid id
+  +string name
+  +string email
+  +string password_hash
+  +string address
+  +point coordinates
+  +datetime created_at
+}
+
+class Category {
+  +uuid id
+  +string name
+}
+
+class Promo {
+  +uuid id
+  +string title
+  +string description
+  +string code
+  +date valid_until
+  +boolean active
+  +uuid merchant_id
+  +uuid category_id
+}
+
+class Claim {
+  +uuid id
+  +uuid user_id
+  +uuid promo_id
+  +datetime claimed_at
+}
+
+class AuthController {
+  +register()
+  +login()
+  +me()
+  +updateMe()
+}
+
+class PartnerController {
+  +register()
+  +login()
+  +me()
+}
+
+class PartnerPromosController {
+  +listMine()
+  +create()
+  +update()
+  +remove()
+}
+
+class AuthContext {
+  +user
+  +token
+  +signIn()
+  +signUp()
+  +signOut()
+}
+
+class PartnerAuthContext {
+  +partner
+  +token
+  +signInPartner()
+  +signUpPartner()
+  +signOutPartner()
+}
+
+Merchant "1" --> "*" Promo : owns
+Category "1" --> "*" Promo : classifies
+User "1" --> "*" Claim : creates
+Promo "1" --> "*" Claim : claimed_in
+
+AuthController ..> User : manages
+PartnerController ..> Merchant : manages
+PartnerPromosController ..> Promo : manages
+
+AuthContext ..> AuthController : calls API
+PartnerAuthContext ..> PartnerController : calls API
+PartnerAuthContext ..> PartnerPromosController : calls API

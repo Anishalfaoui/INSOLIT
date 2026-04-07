@@ -144,6 +144,13 @@ export default function Register() {
             Se connecter
           </Link>
         </p>
+
+        <p className="text-center text-gray-400 text-sm mt-2">
+          Tu es partner ?{' '}
+          <Link to="/partner/register" className="text-neon-cyan hover:underline">
+            Inscription partenaire
+          </Link>
+        </p>
       </div>
     </div>
   )
