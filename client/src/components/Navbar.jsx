@@ -32,11 +32,6 @@ export default function Navbar() {
               -26 ans
             </span>
           </Link>
-          {!isAuthPage && (
-            <Link to="/partner/login" className="text-xs text-gray-400 hover:text-neon-cyan transition-colors">
-              Espace partenaire
-            </Link>
-          )}
           <div className="flex items-center gap-4">
             {user ? (
               <>
@@ -116,11 +111,6 @@ export default function Navbar() {
               <span>Compte</span>
             </NavLink>
           </div>
-          <div className="pb-1 text-center">
-            <Link to="/partner/login" className="text-[11px] text-gray-400">
-              Espace partenaire
-            </Link>
-          </div>
         </nav>
       ) : partner ? (
         <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-dark-border bg-dark-card/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)]">
@@ -157,11 +147,6 @@ export default function Navbar() {
               className="text-center rounded-lg bg-linear-to-r from-neon-purple to-neon-cyan py-2 text-sm font-semibold text-white"
             >
               Inscription
-            </Link>
-          </div>
-          <div className="pb-1 text-center">
-            <Link to="/partner/login" className="text-[11px] text-gray-400">
-              Espace partenaire
             </Link>
           </div>
         </nav>
